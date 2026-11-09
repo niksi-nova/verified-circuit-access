@@ -328,6 +328,13 @@ dependencies = [
     { name = "scipy" },
 ]
 
+[package.optional-dependencies]
+dev = [
+    { name = "hypothesis" },
+    { name = "pytest" },
+    { name = "ruff" },
+]
+
 [package.dev-dependencies]
 dev = [
     { name = "hypothesis" },
@@ -337,15 +344,19 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "hypothesis", marker = "extra == 'dev'", specifier = "==6.170.15" },
     { name = "networkx", specifier = "==3.6.1" },
     { name = "pillow", specifier = "==13.0.0" },
-    { name = "pydantic" },
+    { name = "pydantic", specifier = "==2.14.3" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = "==9.2.0" },
+    { name = "ruff", marker = "extra == 'dev'", specifier = "==0.17.4" },
     { name = "scipy", specifier = "==1.17.1" },
 ]
+provides-extras = ["dev"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "hypothesis" },
-    { name = "pytest" },
-    { name = "ruff" },
+    { name = "hypothesis", specifier = "==6.170.15" },
+    { name = "pytest", specifier = "==9.2.0" },
+    { name = "ruff", specifier = "==0.17.4" },
 ]
