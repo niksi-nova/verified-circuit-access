@@ -1,0 +1,37 @@
+
+{
+  "entries": [
+    {"dataset_name": "Image2Net", "source_label": "antenna", "canonical_name": "antenna", "canonical_id": 1},
+    {"dataset_name": "Image2Net", "source_label": "capacitor", "canonical_name": "capacitor", "canonical_id": 2},
+    {"dataset_name": "Image2Net", "source_label": "capacitor-3", "canonical_name": "capacitor", "canonical_id": 3, "equivalence_note": "Variant of capacitor"},
+    {"dataset_name": "Image2Net", "source_label": "cross-line-curved", "canonical_name": "cross-line-curved", "canonical_id": 4},
+    {"dataset_name": "Image2Net", "source_label": "current", "canonical_name": "current", "canonical_id": 5},
+    {"dataset_name": "Image2Net", "source_label": "diff-amp", "canonical_name": "diff-amp", "canonical_id": 6},
+    {"dataset_name": "Image2Net", "source_label": "diode", "canonical_name": "diode", "canonical_id": 7},
+    {"dataset_name": "Image2Net", "source_label": "gnd", "canonical_name": "ground", "canonical_id": 8},
+    {"dataset_name": "Image2Net", "source_label": "inductor", "canonical_name": "inductor", "canonical_id": 9},
+    {"dataset_name": "Image2Net", "source_label": "inductor-3", "canonical_name": "inductor", "canonical_id": 10, "equivalence_note": "Variant of inductor"},
+    {"dataset_name": "Image2Net", "source_label": "nmos", "canonical_name": "nmos", "canonical_id": 11},
+    {"dataset_name": "Image2Net", "source_label": "nmos-bulk", "canonical_name": "nmos", "canonical_id": 12, "equivalence_note": "NMOS variant"},
+    {"dataset_name": "Image2Net", "source_label": "nmos-cross", "canonical_name": "nmos", "canonical_id": 13, "equivalence_note": "NMOS variant"},
+    {"dataset_name": "Image2Net", "source_label": "npn", "canonical_name": "npn", "canonical_id": 14},
+    {"dataset_name": "Image2Net", "source_label": "npn-cross", "canonical_name": "npn", "canonical_id": 15, "equivalence_note": "NPN variant"},
+    {"dataset_name": "Image2Net", "source_label": "pmos", "canonical_name": "pmos", "canonical_id": 16},
+    {"dataset_name": "Image2Net", "source_label": "pmos-bulk", "canonical_name": "pmos", "canonical_id": 17, "equivalence_note": "PMOS variant"},
+    {"dataset_name": "Image2Net", "source_label": "pmos-cross", "canonical_name": "pmos", "canonical_id": 18, "equivalence_note": "PMOS variant"},
+    {"dataset_name": "Image2Net", "source_label": "pnp", "canonical_name": "pnp", "canonical_id": 19},
+    {"dataset_name": "Image2Net", "source_label": "pnp-cross", "canonical_name": "pnp", "canonical_id": 20, "equivalence_note": "PNP variant"},
+    {"dataset_name": "Image2Net", "source_label": "port", "canonical_name": "port", "canonical_id": 21},
+    {"dataset_name": "Image2Net", "source_label": "resistor", "canonical_name": "resistor", "canonical_id": 22},
+    {"dataset_name": "Image2Net", "source_label": "resistor2", "canonical_name": "resistor", "canonical_id": 23, "equivalence_note": "Resistor variant"},
+    {"dataset_name": "Image2Net", "source_label": "resistor2_3", "canonical_name": "resistor", "canonical_id": 24, "equivalence_note": "Resistor variant"},
+    {"dataset_name": "Image2Net", "source_label": "single-end-amp", "canonical_name": "single-end-amp", "canonical_id": 25},
+    {"dataset_name": "Image2Net", "source_label": "single-input-single-end-amp", "canonical_name": "single-input-single-end-amp", "canonical_id": 26},
+    {"dataset_name": "Image2Net", "source_label": "switch", "canonical_name": "switch", "canonical_id": 27},
+    {"dataset_name": "Image2Net", "source_label": "switch-3", "canonical_name": "switch", "canonical_id": 28, "equivalence_note": "Switch variant"},
+    {"dataset_name": "Image2Net", "source_label": "vdd", "canonical_name": "vdd", "canonical_id": 29},
+    {"dataset_name": "Image2Net", "source_label": "voltage", "canonical_name": "voltage", "canonical_id": 30},
+    {"dataset_name": "Image2Net", "source_label": "voltage-lines", "canonical_name": "voltage-lines", "canonical_id": 31}
+  ],
+  "unmapped_labels": []
+}

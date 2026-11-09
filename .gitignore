@@ -25,3 +25,10 @@ data/private/
 
 # OS/editor
 .DS_Store
+data/
+data/private/
+results/
+.env
+*.egg-info/
+__pycache__/
+.venv/
