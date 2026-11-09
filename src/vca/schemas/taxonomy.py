@@ -1,3 +1,4 @@
+
 import json
 from pathlib import Path
 
@@ -32,10 +33,13 @@ class TaxonomyStore(BaseModel):
         dataset_name: str,
         source_label: str,
     ) -> tuple[str, int]:
+        """Return the canonical category using case-insensitive lookup."""
+        normalized_label = source_label.strip().lower()
+
         for entry in self.entries:
             if (
                 entry.dataset_name == dataset_name
-                and entry.source_label == source_label
+                and entry.source_label.lower() == normalized_label
             ):
                 return entry.canonical_name, entry.canonical_id
 

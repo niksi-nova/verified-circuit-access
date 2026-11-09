@@ -1,4 +1,5 @@
-"""Render ground-truth and predicted bounding boxes over circuit images."""
+
+"""Render evaluation overlays over circuit images."""
 
 from pathlib import Path
 
@@ -60,8 +61,9 @@ def render_overlay(
     ground_truth_annotations: list[AnnotationRecord],
     predicted_annotations: list[AnnotationRecord],
     output_path: str | Path,
+    legend_lines: list[str] | None = None,
 ) -> Path:
-    """Render ground-truth and prediction boxes and save the PNG."""
+    """Render bounding boxes and an optional text legend."""
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -97,6 +99,29 @@ def render_overlay(
             ),
             color=(255, 0, 0),
         )
+
+    # Optional legend for predictions without spatial annotations.
+    if legend_lines:
+        line_height = 16
+        padding = 6
+        legend_height = len(legend_lines) * line_height + 2 * padding
+
+        draw.rectangle(
+            (
+                0,
+                0,
+                image.width,
+                min(legend_height, image.height),
+            ),
+            fill=(255, 255, 255),
+        )
+
+        for index, line in enumerate(legend_lines):
+            draw.text(
+                (padding, padding + index * line_height),
+                line,
+                fill=(0, 0, 0),
+            )
 
     image.save(output_path, format="PNG")
     return output_path

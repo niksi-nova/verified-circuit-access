@@ -72,3 +72,9 @@ def test_every_source_label_is_accounted_for():
     }
 
     assert source_labels <= represented_labels
+
+def test_known_label_lookup_is_case_insensitive():
+    assert TAXONOMY.get_canonical("Image2Net", "NMOS") == (
+        "nmos",
+        11,
+    )

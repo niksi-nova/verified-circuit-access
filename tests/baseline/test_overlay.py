@@ -49,3 +49,28 @@ def test_render_overlay_creates_valid_png(tmp_path: Path):
     with Image.open(output_path) as rendered:
         assert rendered.format == "PNG"
         assert rendered.size == (100, 100)
+
+def test_render_overlay_with_legend(tmp_path: Path):
+    image_path = tmp_path / "input.png"
+    output_path = tmp_path / "overlay.png"
+
+    Image.new("RGB", (200, 100), "white").save(image_path)
+
+    result_path = render_overlay(
+        image_path,
+        ground_truth_annotations=[],
+        predicted_annotations=[],
+        output_path=output_path,
+        legend_lines=[
+            "VLM predictions (localization unavailable):",
+            "- resistor",
+            "- capacitor",
+        ],
+    )
+
+    assert result_path.exists()
+
+    with Image.open(result_path) as rendered:
+        assert rendered.format == "PNG"
+        assert rendered.size == (200, 100)
+        assert rendered.getpixel((1, 1)) == (255, 255, 255)
