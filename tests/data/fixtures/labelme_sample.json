@@ -1,0 +1,38 @@
+{
+  "version": "5.0.1",
+  "flags": {},
+  "shapes": [
+    {
+      "label": "resistor",
+      "points": [[20.0, 30.0], [80.0, 50.0]],
+      "group_id": null,
+      "shape_type": "rectangle",
+      "flags": {}
+    },
+    {
+      "label": "capacitor",
+      "points": [[100.0, 20.0], [130.0, 60.0]],
+      "group_id": null,
+      "shape_type": "rectangle",
+      "flags": {}
+    },
+    {
+      "label": "diode",
+      "points": [[150.0, 40.0], [190.0, 70.0]],
+      "group_id": null,
+      "shape_type": "rectangle",
+      "flags": {}
+    },
+    {
+      "label": "npn",
+      "points": [[200.0, 80.0], [250.0, 130.0]],
+      "group_id": null,
+      "shape_type": "rectangle",
+      "flags": {}
+    }
+  ],
+  "imagePath": "fixture_only.png",
+  "imageData": null,
+  "imageHeight": 150,
+  "imageWidth": 300
+}

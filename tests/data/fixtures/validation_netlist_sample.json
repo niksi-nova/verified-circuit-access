@@ -1,0 +1,46 @@
+[
+  {
+    "ckt_netlist": [
+      {
+        "component_type": "NMOS",
+        "port_connection": {
+          "Drain": "net1",
+          "Gate": "net2",
+          "Source": "net3"
+        }
+      },
+      {
+        "component_type": "RESISTOR",
+        "port_connection": {
+          "1": "net1",
+          "2": "net3"
+        }
+      },
+      {
+        "component_type": "RESISTOR",
+        "port_connection": {
+          "1": "net2",
+          "2": "net3"
+        }
+      }
+    ]
+  },
+  {
+    "ckt_netlist": [
+      {
+        "component_type": "DIODE",
+        "port_connection": {
+          "Anode": "netA",
+          "Cathode": "netB"
+        }
+      },
+      {
+        "component_type": "RESISTOR",
+        "port_connection": {
+          "1": "netA",
+          "2": "netB"
+        }
+      }
+    ]
+  }
+]

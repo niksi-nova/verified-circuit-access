@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .ruff_cache/
+*.egg-info/
 
 # Virtual environments
 .venv/
@@ -13,8 +14,8 @@ venv/
 .env.*
 !.env.example
 
-# Data - never commit datasets
-data/
+# Datasets - never commit
+/data/
 data/private/
 
 # Model weights
@@ -23,12 +24,8 @@ data/private/
 *.onnx
 *.keras
 
+# Results
+results/
+
 # OS/editor
 .DS_Store
-data/
-data/private/
-results/
-.env
-*.egg-info/
-__pycache__/
-.venv/

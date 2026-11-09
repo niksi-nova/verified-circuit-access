@@ -1,0 +1,26 @@
+<annotation>
+    <filename>circuit_sample.png</filename>
+    <size>
+        <width>100</width>
+        <height>100</height>
+        <depth>3</depth>
+    </size>
+    <object>
+        <name>resistor</name>
+        <bndbox>
+            <xmin>10</xmin>
+            <ymin>20</ymin>
+            <xmax>40</xmax>
+            <ymax>30</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>capacitor</name>
+        <bndbox>
+            <xmin>50</xmin>
+            <ymin>40</ymin>
+            <xmax>70</xmax>
+            <ymax>60</ymax>
+        </bndbox>
+    </object>
+</annotation>
