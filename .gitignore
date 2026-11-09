@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Data - never commit datasets
+data/
+data/private/
+
+# Model weights
+*.pt
+*.pth
+*.onnx
+*.keras
+
+# OS/editor
+.DS_Store
