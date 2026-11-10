@@ -1,424 +1,170 @@
-# Verified Circuit Access
+# VERIFIED-CIRCUIT-ACCESS
 
-**Making circuit diagrams accessible to blind students through verified, structured representations.**
+**Verified circuit diagram understanding and accessible explanations for blind and visually impaired students.**
 
-## 1. Problem Statement
+VERIFIED-CIRCUIT-ACCESS is a system designed to convert circuit diagram images into structured, verified electrical representations and accessible explanations. It aims to make circuit diagrams easier to understand through screen-reader-friendly descriptions and other accessible representations.
 
-Circuit diagrams are widely used in high-school and undergraduate science and engineering education. However, these diagrams are primarily visual. Blind and visually impaired students may therefore be unable to independently identify electronic components, understand their electrical connections, and follow the overall structure of a circuit.
+## 1. Project overview
 
-Existing text-to-speech and screen-reader tools cannot directly communicate the spatial and electrical relationships represented in circuit diagrams.
+Circuit diagrams contain visual information such as components, terminals, wires, connections, labels, and electrical relationships. For blind and visually impaired students, understanding these diagrams can be difficult because conventional learning materials rely heavily on visual interpretation.
 
-**Verified Circuit Access** aims to address this accessibility gap by converting circuit images into structured, verified representations that can eventually be communicated through screen readers, Braille displays, and tactile diagrams.
+This project aims to bridge that gap by developing a pipeline that:
 
-The central idea is to avoid presenting extracted circuit information as automatically correct. A verification layer is planned to identify potentially incorrect components and connections before explanations are generated.
+1. Extracts circuit components and connections from circuit diagram images.
+2. Represents the extracted circuit as a structured netlist graph.
+3. Evaluates the correctness of the extracted representation.
+4. Uses verified graph information to generate circuit explanations.
+5. Supports accessible output formats such as screen-reader-friendly text, Braille-compatible descriptions, and tactile diagram representations.
 
-## 2. Project Architecture
+The project prioritizes verification and traceability rather than relying solely on generated explanations.
 
-The planned system follows this pipeline:
+## 2. System architecture
 
 ```mermaid
 flowchart TD
-    A[Circuit Image] --> B[Extraction]
-    B --> C[Verified Netlist Graph]
-    C --> D[Layered Explanation]
-
-    D --> E[Screen-reader Text]
-    D --> F[Braille-ready Text]
-    D --> G[Tactile SVG]
-
-    subgraph M1["M1 — Data Audit and Baseline"]
-        B1[Dataset Loaders and Schemas]
-        B2[VLM Baseline]
-        B3[Graph Metrics and Evaluation]
-    end
-
-    subgraph M2["M2 — Training (planned)"]
-        H[Component Detection]
-        I[Orientation and Polarity Classification]
-        J[Net Extraction]
-        K[Trained Verifier]
-    end
-
-    subgraph M3["M3 — Explanation and Evaluation (planned)"]
-        L[Graph-grounded Explanation]
-        M[ngspice Simulation]
-        N[Accessible Output Generation]
-        O[Downstream Comprehension Evaluation]
-    end
+    A["Circuit Diagram Image"] --> B["Component and Connection Extraction"]
+    B --> C["Structured Netlist"]
+    C --> D["Canonical Circuit Graph"]
+    D --> E["Verification and Evaluation"]
+    E --> F["Verified Circuit Representation"]
+    F --> G["Layered Circuit Explanation"]
+    G --> H["Screen-reader-friendly Output"]
+    G --> I["Braille-compatible Output"]
+    G --> J["Tactile Diagram Representation"]
 ```
 
-### Milestones
+The intended architecture separates extraction, graph representation, verification, and explanation. This allows the correctness of the underlying circuit representation to be evaluated independently of the generated explanation.
 
-**M1 — Data Audit and Baseline**
+## 3. Main objectives
 
-Establishes dataset governance, common annotation and netlist schemas, dataset loaders, evaluation metrics, and a provider-independent VLM baseline and evaluation framework.
+- Develop structured schemas for circuit annotations, components, terminals, and electrical connections.
+- Integrate circuit diagram datasets with documented licensing and access conditions.
+- Convert netlists into canonical graph representations.
+- Evaluate extracted circuits using graph-based metrics.
+- Establish a baseline interface for vision-language model predictions.
+- Identify potentially incorrect extractions for review.
+- Ensure numerical explanations are grounded in circuit simulation results.
+- Develop accessible representations suitable for blind and visually impaired students.
 
-**M2 — Training (planned, not started)**
+## 4. Repository status
 
-- Component detection using a YOLO-family detector.
-- Orientation, polarity, and crossing-versus-junction classification.
-- Electrical net extraction.
-- A trained verifier using gradient boosting and calibration.
+The repository currently contains the foundational implementation for Milestone 1 (M1).
 
-**M3 — Explanation and Evaluation (planned, not started)**
-
-- Layered explanations generated from verified circuit graphs.
-- Numeric electrical facts grounded in ngspice simulation.
-- Screen-reader text, Braille-ready output using liblouis, and tactile-printable SVG.
-- Downstream comprehension evaluation.
-
-## 3. M1 — Data Audit and Baseline
-
-M1 establishes the data, representation, evaluation, and baseline infrastructure required for the circuit-understanding pipeline.
-
-### 3.1 Dataset Audit and Data Governance
-
-The project considers six datasets:
-
-| Dataset | Intended use | Current status |
-|---|---|---|
-| Image2Net | Component annotations and circuit netlists | Validation data integrated; approved for academic/non-commercial use |
-| CGHD | Additional circuit diagram and component data | Gated; licensing unresolved |
-| AMSnet 2.0 | Additional circuit understanding data | Access and licensing verification pending |
-| Masala-CHAI | Weakly labelled circuit data | Weak labels only; not for evaluation |
-| SINA | Wire and net extraction | Access and licensing verification pending |
-| CircuitReason-1k | Downstream circuit reasoning and comprehension | Distribution and image-use conditions need verification |
-
-The dataset audit is documented in `DATASETS.md`.
-
-It records:
-
-- Official dataset source.
-- Licensing and access conditions.
-- Dataset size and annotation format.
-- Intended use.
-- Risks and restrictions.
-
-Datasets with unresolved licensing or access conditions remain gated.
-
-**Image2Net integration**
-
-The Image2Net validation dataset from `LAD021/ci2n_datasets` has been integrated using a pinned source commit.
-
-The local validation data contains:
-
-- 122 circuit images.
-- 122 corresponding golden JSON files.
-- A dataset manifest recording source provenance.
-
-The files are stored locally under `data/image2net/` and excluded from Git. They are not redistributed through the repository.
-
-The academic/non-commercial use approval does not imply permission to redistribute the original dataset.
-
-The CGHD loader remains deliberately gated through `DatasetGatedError`. No workaround or unofficial dataset source is used.
-
-### 3.2 Unified Annotation Schema
-
-Different circuit datasets use different annotation formats and component labels. A common representation is necessary to combine their information consistently.
-
-Pydantic schemas are implemented in:
-
-`src/vca/schemas/annotation.py`
-
-The main structures are:
-
-- `ImageRecord`
-- `CategoryRecord`
-- `BoundingBox`
-- `AnnotationRecord`
-- `COCODataset`
-
-A bounding box represents the location of a component in an image using its coordinates, width, and height. An annotation associates that location with a component category and image.
-
-This provides a common COCO-style representation for component annotations.
-
-### 3.3 Harmonized Component Taxonomy
-
-Different datasets may use different names or identifiers for the same electrical component.
-
-A taxonomy mapping converts dataset-specific labels into canonical component categories.
-
-Implemented in:
-
-- `src/vca/schemas/taxonomy.py`
-- `src/vca/schemas/taxonomy.json`
-
-The taxonomy provides:
-
-- Dataset-specific source-label mapping.
-- Canonical component names and IDs.
-- Case-insensitive lookup.
-- An `unknown` fallback for unmapped labels.
-- Preservation of original source labels.
-
-The lookup function is:
-
-```python
-get_canonical(dataset_name, source_label)
-```
-
-It returns the canonical category and its corresponding ID.
-
-Image2Net validation labels have been mapped to the project's canonical taxonomy, with no unknown labels in the inspected validation set.
-
-### 3.4 Netlist Schema — Structured Electrical Representation
-
-A netlist is a structured representation of an electrical circuit. It describes the components, their terminals, and the electrical connections between those terminals.
-
-The Pydantic netlist schema is implemented in:
-
-`src/vca/schemas/netlist.py`
-
-The main structures are:
-
-- **Component:** Represents an electrical component, its ID, canonical category, and terminals.
-- **Terminal:** Represents an individual connection point on a component.
-- **Net:** Represents an electrical connection shared by component terminals.
-- **NetEndpoint:** Identifies a component terminal belonging to a net.
-- **Netlist:** Contains the complete collection of components and nets.
-
-The schema validates:
-
-- Unique component IDs and net names.
-- Unique terminal names within a component.
-- Valid component and terminal references.
-- At least one endpoint per net.
-- No endpoint appearing in multiple nets.
-
-The minimum endpoint count accommodates single-endpoint nets present in the Image2Net validation data, including ground-related connections.
-
-The representation uses component-to-net relationships rather than treating a circuit as merely a collection of visual lines.
-
-### 3.5 Dataset Loaders and Format Conversion
-
-Dataset annotations must be converted into internal schemas before they can be used by downstream modules.
-
-The Image2Net loader is implemented in:
-
-`src/vca/data/image2net.py`
-
-Supported operations include:
-
-| Loader | Functionality |
+| Component | Current status |
 |---|---|
-| `load_labelme_json()` | Reads Labelme component annotations and converts them into the internal annotation schema |
-| `load_yolo_obb()` | Converts YOLO oriented bounding-box polygon annotations into COCO-style bounding boxes |
-| `load_validation_netlist()` | Converts validation netlist data into the Pydantic Netlist representation |
+| Project configuration and development setup | Implemented |
+| Annotation schema | Implemented |
+| Netlist schema | Implemented |
+| Component taxonomy | Implemented |
+| Image2Net dataset integration | Implemented |
+| Dataset taxonomy audit | Implemented |
+| CGHD dataset integration | Gated stub |
+| Graph isomorphism metric | Implemented |
+| Normalized graph edit distance (NED) | Implemented |
+| VLM baseline interface | Implemented |
+| Evaluation framework | Implemented |
+| Evaluation overlays | Implemented |
+| Results storage | Implemented |
+| Trained component verifier | Not implemented |
+| ngspice-based numerical verification | Not implemented |
+| Accessible explanation generation | Future implementation |
+| Screen-reader, Braille, and tactile output | Future implementation |
 
-The loaders validate input structure, coordinates, required fields, and source labels. Malformed input produces contextual errors rather than silently generating invalid annotations.
+**Important:** Implemented infrastructure does not imply that a trained model or complete end-to-end system is available. Model training and real evaluation results have not yet been established.
 
-The CGHD loader in `src/vca/data/cghd.py` remains gated through `DatasetGatedError` because its licensing evidence is unresolved.
+## 5. Technology stack
 
-### 3.6 Evaluation Metrics
-
-Circuit extraction must be evaluated at both the component and electrical-connectivity levels.
-
-The metric implementations are located in `src/vca/metrics/`.
-
-#### 3.6.1 Normalized Edit Distance (NED)
-
-NED measures the structural difference between a predicted netlist and its ground-truth netlist using graph edit distance.
-
-The normalization used by the canonical implementation is:
-
-\[
-NED = \frac{GED}{N_{\text{devices}} + N_{\text{nets}} + N_{\text{ports}}}
-\]
-
-The implementation is in:
-
-`src/vca/metrics/ned.py`
-
-It constructs a canonical component-net incidence graph:
-
-- Components and nets are represented as different node types.
-- Component categories are preserved.
-- Terminal names are preserved as edge labels.
-- Component IDs and net names do not determine graph matching.
-- Insertions, deletions, and incompatible substitutions use unit costs.
-
-An empty ground-truth graph or a GED computation that times out returns `None`.
-
-**Important:** This is the project's canonical NED implementation. It is not an exact reproduction of Image2Net's original GED implementation. Image2Net-compatible GED remains a separate metric task.
-
-#### 3.6.2 Graph-Isomorphism Accuracy
-
-This metric checks whether predicted and ground-truth circuit graphs have equivalent structures.
-
-The implementation constructs a bipartite incidence graph containing component nodes and net nodes. Component categories and terminal relationships are preserved, while arbitrary component IDs and net names are ignored.
-
-#### 3.6.3 Component Precision and Recall
-
-These metrics evaluate whether predicted components match ground-truth components.
-
-The component-matching framework uses Hungarian assignment, with matching constrained by:
-
-- Canonical component categories.
-- A maximum component-centre distance of 10 pixels.
-
-The 10-pixel threshold is provisional and has not been established as a validated performance threshold.
-
-#### 3.6.4 Connection Precision and Recall
-
-These metrics compare electrical net endpoint sets while preserving component-terminal relationships.
-
-The current component-correspondence implementation requires complete graph isomorphism. Consequently, connection precision and recall are not yet independent measures for non-isomorphic graphs. Such values must remain unavailable rather than being reported misleadingly.
-
-### 3.7 Vision-Language Model (VLM) Baseline Interface
-
-A Vision-Language Model can process circuit images and produce structured text or JSON representations.
-
-M1 introduces a provider-independent interface for an image-to-netlist baseline.
-
-Implemented in `src/vca/baseline/`:
-
-- `provider.py`: Defines the abstract VLM provider interface and environment-variable validation.
-- `interface.py`: Handles predictions, Netlist JSON validation, retries, and logging.
-- `errors.py`: Defines errors for exhausted retries, configuration failures, and missing approval.
-
-The interface retries when a provider returns invalid JSON and raises `VLMExhaustedError` when all attempts fail.
-
-A mock provider is used for testing without making real API calls.
-
-**Current limitation:** A real VLM provider has not yet been selected or integrated.
-
-### 3.8 Evaluation Framework and Failure Overlays
-
-The evaluation workflow is implemented in:
-
-`src/vca/baseline/evaluation.py`
-
-It connects image inputs, ground-truth netlists, the VLM interface, graph comparison, and results storage.
-
-The workflow:
-
-1. Checks explicit dataset and VLM approval before accessing inputs.
-2. Discovers supported circuit image files.
-3. Finds the corresponding ground-truth netlist.
-4. Sends the image to the configured VLM.
-5. Validates the returned Netlist.
-6. Compares predicted and ground-truth graph structures.
-7. Records evaluation outcomes and failures.
-8. Generates available visual overlays.
-9. Saves metrics and experiment metadata.
-
-The overlay utility in `overlay.py` draws ground-truth annotations and predicted boxes when prediction coordinates are available.
-
-The current VLM interface produces netlist-only predictions without bounding boxes. Predicted localization is therefore not fabricated. The current workflow uses ground-truth overlays with an explanatory legend.
-
-The evaluation framework currently supports graph-isomorphism outcomes. Real VLM evaluation has not yet been performed.
-
-### 3.9 Results Storage and Reproducibility
-
-The results infrastructure is implemented in:
-
-`src/vca/baseline/results.py`
-
-Each evaluation run is designed to store:
-
-- Metrics output.
-- Configuration information.
-- Git commit SHA.
-- Random seed.
-- Dataset and input provenance through the evaluation manifest.
-
-The implementation avoids overwriting previous results when a run ID is reused.
-
-Results are stored locally and excluded from Git by default.
-
-No real VLM evaluation metrics are currently claimed.
-
-### 3.10 Automated Testing and Code Quality
-
-M1 includes unit tests and property-based tests for schemas, loaders, metrics, and the VLM interface.
-
-The project uses:
-
-- **pytest:** Automated unit and integration testing.
-- **Hypothesis:** Property-based testing.
-- **Ruff:** Python linting and code-quality checks.
-
-Tests cover schema validation, serialization, taxonomy lookup, annotation conversion, metric invariants, graph operations, and VLM retry behaviour.
-
-**Latest reported verification:**
-
-- **117 tests passed.**
-- **Ruff:** All checks passed.
-
-These are software test results, not real-data model evaluation results.
-
-## 4. Technology Stack
-
-| Technology | Purpose |
+| Area | Technology |
 |---|---|
-| Python 3.11 | Primary implementation language |
-| Pydantic | Structured data validation |
-| NetworkX | Graph construction, graph isomorphism, and graph edit distance |
-| SciPy | Hungarian assignment for component matching |
-| Pillow | Evaluation overlays |
-| pytest | Automated testing |
-| Hypothesis | Property-based testing |
-| Ruff | Linting |
-| uv | Dependency and environment management |
+| Programming language | Python 3.11 |
+| Graph representation | NetworkX |
+| Data validation | Pydantic |
+| Image handling | Pillow |
+| Numerical operations | SciPy |
+| Testing | pytest |
+| Property-based testing | Hypothesis |
+| Code quality | Ruff |
+| Dataset integration | Image2Net validation dataset |
 
-## 5. Setup and Reproduction
+Dependencies are pinned in `pyproject.toml`, and the repository includes a `uv.lock` lockfile.
 
-### Prerequisites
+## 6. Project structure
 
-- Python 3.11
-- pip
-- Git
-- Linux, macOS, or another compatible Python environment
-
-### Step 1: Clone the repository
-
-```bash
-git clone <repository-url>
-cd verified-circuit-access
+```text
+verified-circuit-access/
+│
+├── data/
+│   └── image2net/
+│       ├── images/
+│       ├── golden/
+│       └── manifest.json
+│
+├── scripts/
+│   ├── download_image2net_validation.py
+│   └── list_image2net_labels.py
+│
+├── src/
+│   └── vca/
+│       ├── schemas/
+│       │   ├── annotation.py
+│       │   ├── netlist.py
+│       │   └── taxonomy.py
+│       │
+│       ├── data/
+│       │   ├── image2net.py
+│       │   └── cghd.py
+│       │
+│       ├── metrics/
+│       │   ├── ned.py
+│       │   └── graph_iso.py
+│       │
+│       └── baseline/
+│           ├── errors.py
+│           ├── evaluation.py
+│           ├── interface.py
+│           ├── overlay.py
+│           ├── provider.py
+│           └── results.py
+│
+├── tests/
+│   ├── schemas/
+│   ├── data/
+│   ├── metrics/
+│   └── baseline/
+│
+├── .env.example
+├── .gitignore
+├── Makefile
+├── pyproject.toml
+├── uv.lock
+├── DATASETS.md
+├── PLAN.md
+└── README.md
 ```
 
-### Step 2: Create and activate a virtual environment
+The `data/` directory is local project data and is not intended to be committed to Git. The structure shown represents the current implementation and its principal modules.
 
-```bash
-python3.11 -m venv .venv
-source .venv/bin/activate
+## 7. Dataset integration
+
+### Image2Net validation dataset
+
+The project integrates the validation data from the Image2Net dataset repository:
+
+**Source:** [LAD021/ci2n_datasets](https://github.com/LAD021/ci2n_datasets)
+
+**Pinned source commit:**
+
+```text
+2ffd41b2255726eb1be215fa7ba1d9808c80c808
 ```
 
-On Windows:
+The local validation dataset contains:
 
-```powershell
-.venv\Scripts\activate
-```
+- 122 circuit diagram images.
+- 122 corresponding golden JSON annotation files.
+- A local manifest recording dataset information.
 
-### Step 3: Install dependencies
-
-Using pip:
-
-```bash
-pip install -e ".[dev]"
-```
-
-Alternatively, using the existing uv lockfile:
-
-```bash
-uv sync --locked
-```
-
-### Step 4: Configure environment variables
-
-Copy the example environment file only when configuring a provider that needs credentials:
-
-```bash
-cp .env.example .env
-```
-
-The `.env.example` file documents the expected environment-variable configuration. Real credentials must never be committed to Git.
-
-### Step 5: Dataset preparation
-
-Review `DATASETS.md` before accessing any dataset.
-
-The Image2Net validation files are expected under:
+The dataset is stored under:
 
 ```text
 data/image2net/
@@ -427,197 +173,407 @@ data/image2net/
 └── manifest.json
 ```
 
-These files are not included in the Git repository. Follow the dataset source and access conditions before downloading or using them.
+The dataset integration includes:
 
-The current `make data` target is a placeholder. An interactive dataset approval and download workflow has not yet been implemented.
+- Loading circuit images and corresponding annotations.
+- Normalizing the annotation structure.
+- Mapping dataset component labels to the project's component taxonomy.
+- Constructing structured netlist representations.
+- Supporting downstream graph-based evaluation.
 
-### Step 6: Evaluation
+The dataset-wide taxonomy audit covered 1,573 components and found zero unknown component labels.
 
-The intended command is:
+### Dataset access and licensing
 
-```bash
-make eval
-```
+Dataset access and licensing conditions are documented in `DATASETS.md`.
 
-The current Makefile evaluation target is a placeholder and does not yet execute the complete real-data VLM evaluation.
+The Image2Net validation data is used under the approved academic/non-commercial access conditions established for this project.
 
-The Python evaluation framework requires separate explicit dataset and VLM approvals through:
+The dataset is not distributed through this repository. A fresh clone does not automatically contain the downloaded images or annotation files.
 
-```python
-data_approved=True
-vlm_approved=True
-```
+To obtain the validation data, follow the access and licensing requirements documented in `DATASETS.md`.
 
-These approvals do not override unresolved dataset licensing restrictions.
+### Downloading the validation data
 
-No real VLM API evaluation has been completed.
-
-### Step 7: Demo
+After satisfying the documented dataset access requirements, run:
 
 ```bash
-make demo
+python scripts/download_image2net_validation.py
 ```
 
-The demo target is currently a placeholder and does not launch a complete application.
+The script downloads/verifies the validation pairs and creates a local manifest.
 
-### Step 8: Run tests and lint
+The currently verified local dataset contains 122 pairs.
+
+**Note:** The dataset is excluded from Git. Do not commit dataset images, golden annotation files, or other restricted dataset contents.
+
+### CGHD dataset
+
+CGHD integration is currently a gated stub.
+
+The implementation deliberately raises `DatasetGatedError` rather than silently accessing or using data whose access requirements have not been satisfied.
+
+It is not currently an operational dataset loader.
+
+## 8. Data schemas
+
+The project uses structured schemas to maintain consistency between extracted circuit information and evaluation.
+
+The principal schema modules are:
+
+| Schema | Purpose |
+|---|---|
+| `annotation.py` | Represents circuit annotation information |
+| `netlist.py` | Represents circuit components, terminals, nets, and connections |
+| `taxonomy.py` | Defines and normalizes component categories |
+
+The netlist representation retains terminal-level connection information. This is important because two circuits containing the same components may still have different electrical topologies.
+
+The schemas use Pydantic for data validation.
+
+## 9. Graph representation
+
+Circuit netlists are converted into canonical component-net incidence graphs.
+
+The graph contains:
+
+- **Component nodes:** Represent electrical components and their canonical categories.
+- **Net nodes:** Represent electrical nets.
+- **Edges:** Represent connections between component terminals and nets.
+- **Terminal labels:** Preserve which terminal of a component is connected to a particular net.
+
+This representation allows the evaluation framework to compare electrical connectivity rather than relying on component identifiers or net names.
+
+Component IDs and net names are not treated as the defining basis of graph equivalence.
+
+## 10. Evaluation metrics
+
+### 10.1 Graph isomorphism
+
+The graph isomorphism implementation evaluates whether two circuit graph representations have equivalent structures under the implemented matching rules.
+
+It provides a structural comparison of the predicted and ground-truth representations.
+
+Implementation:
+
+```text
+src/vca/metrics/graph_iso.py
+```
+
+### 10.2 Normalized graph edit distance (NED)
+
+The project implements a canonical normalized graph edit distance metric.
+
+Implementation:
+
+```text
+src/vca/metrics/ned.py
+```
+
+The metric compares canonical component-net incidence graphs using graph edit operations.
+
+The implemented operations include:
+
+- Node insertion and deletion.
+- Edge insertion and deletion.
+- Node substitution.
+- Edge substitution.
+
+Substitution costs distinguish component categories, node types, and terminal labels.
+
+The result is normalized using the ground-truth graph size, including its component nodes, net nodes, and endpoint edges.
+
+An empty ground-truth graph produces no score. A graph edit distance computation that exceeds its timeout also produces no score.
+
+**Metric distinction:** This is the project's canonical NED implementation. It should not be described as an exact reproduction of Image2Net's original graph edit distance implementation.
+
+### 10.3 Evaluation framework
+
+The evaluation framework provides infrastructure for:
+
+- Comparing predicted circuit representations with ground truth.
+- Computing graph-based metrics.
+- Recording evaluation outputs.
+- Generating visual overlays.
+- Storing evaluation results.
+
+Implementation:
+
+```text
+src/vca/baseline/evaluation.py
+src/vca/baseline/overlay.py
+src/vca/baseline/results.py
+```
+
+A complete trained-model evaluation has not yet been performed.
+
+## 11. VLM baseline infrastructure
+
+The project contains a baseline interface for vision-language model predictions.
+
+The baseline infrastructure separates:
+
+- Provider integration.
+- Prediction interfaces.
+- Evaluation.
+- Error handling.
+- Overlay generation.
+- Results storage.
+
+Relevant modules:
+
+```text
+src/vca/baseline/
+├── errors.py
+├── evaluation.py
+├── interface.py
+├── overlay.py
+├── provider.py
+└── results.py
+```
+
+The provider interface is intended to allow different model providers to be integrated without changing the evaluation framework.
+
+A mock provider can be used for infrastructure-level testing. It must not be treated as a real model prediction or as evidence of model performance.
+
+Predictions that do not contain bounding-box information must not be assigned fabricated bounding boxes. Some spatial or terminal-orientation evaluations may therefore be marked as not evaluated when the required evidence is unavailable.
+
+## 12. Reproducibility and evaluation results
+
+The project uses:
+
+- Pinned Python dependencies.
+- A tracked `uv.lock` lockfile.
+- Fixed-seed testing practices.
+- pytest for automated tests.
+- Ruff for code-quality checks.
+- Dataset source commit information.
+- Local result storage for evaluation provenance.
+
+Evaluation results must be associated with their relevant configuration, random seed, and Git commit.
+
+No model-performance metrics should be interpreted as established until an actual evaluation has been executed and its provenance recorded.
+
+### Current verification status
+
+| Verification | Status |
+|---|---|
+| Full automated test suite | 117 passed |
+| NED unit tests | 6 passed |
+| Ruff checks | Passed |
+| Dataset validation pairs | 122 downloaded/verified locally |
+| Dataset taxonomy audit | 1,573 components; zero unknown labels |
+| Model training | Not run |
+| Real VLM evaluation | Not run |
+| Circuit simulation evaluation | Not run |
+| End-to-end accessibility evaluation | Not run |
+
+The test results above refer to the latest recorded project verification. Run the commands below to verify the current checkout independently.
+
+## 13. Installation and setup
+
+### Prerequisites
+
+- Linux, macOS, or Windows with a compatible Python environment.
+- Python 3.11.x.
+- Git.
+- pip, or uv if using the lockfile-based setup.
+
+Check your Python version:
+
+```bash
+python --version
+```
+
+The project requires:
+
+```text
+Python >=3.11,<3.12
+```
+
+### Clone the repository
+
+```bash
+git clone https://github.com/niksi-nova/verified-circuit-access.git
+cd verified-circuit-access
+```
+
+If you are working from a feature branch:
+
+```bash
+git switch feat/m1-implementation
+```
+
+### Option A: Install using pip
+
+Create a virtual environment:
+
+```bash
+python3.11 -m venv .venv
+```
+
+Activate it on Linux/macOS:
+
+```bash
+source .venv/bin/activate
+```
+
+On Windows PowerShell:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+Upgrade pip:
+
+```bash
+python -m pip install --upgrade pip
+```
+
+Install the project and development dependencies:
+
+```bash
+python -m pip install -e ".[dev]"
+```
+
+### Option B: Install using uv
+
+Install uv:
+
+```bash
+python -m pip install uv
+```
+
+Synchronize the environment using the tracked lockfile:
+
+```bash
+uv sync --locked
+```
+
+Activate the environment on Linux/macOS:
+
+```bash
+source .venv/bin/activate
+```
+
+Use either the pip installation route or the uv installation route. There is no need to perform both.
+
+### Environment variables
+
+The repository includes an `.env.example` file for documenting future provider configuration.
+
+It does not contain real credentials.
+
+Never commit API keys, access tokens, passwords, or other secrets. Credentials should be supplied through environment variables when a real provider is integrated.
+
+## 14. Running tests and code-quality checks
+
+Activate the virtual environment before running the commands.
 
 Run the full test suite:
 
 ```bash
-pytest -v
+python -m pytest
 ```
 
-Run lint checks:
+Run tests with verbose output:
+
+```bash
+python -m pytest -v
+```
+
+Run Ruff:
 
 ```bash
 ruff check .
 ```
 
-## 6. Dataset Approval and Access Status
+Check formatting:
 
-Dataset approval is tracked separately from implementation.
-
-| Dataset | Status | Notes |
-|---|---|---|
-| Image2Net (`ci2n_datasets`) | Approved for academic/non-commercial use | Validation data integrated locally; original-source licensing caveats still apply |
-| CGHD | Gated | Conflicting license information; release licensing unresolved |
-| AMSnet 2.0 | Pending | License and confirmed public access or distribution unverified |
-| Masala-CHAI | Pending | License and distribution source unclear; weak labels only |
-| SINA | Pending | Explicit license and dataset distribution source unverified |
-| CircuitReason-1k | Pending | Image distribution and usage rights need verification |
-
-Refer to `DATASETS.md` for the detailed source, license, format, size, intended use, and risk audit.
-
-Dataset approval and VLM approval are separate. Approval to use one dataset does not authorize access to another dataset or use of a real API provider.
-
-## 7. Evaluation Metrics and Results
-
-The following metrics form part of the M1 evaluation design.
-
-| Metric | Implementation status | Real-data result |
-|---|---|---|
-| Canonical NED | Implemented and unit-tested | Not run |
-| Image2Net-compatible GED | Pending | Not run |
-| Graph-isomorphism accuracy | Implemented | Not run |
-| Component precision | Framework available; evaluation needs completion | Not run |
-| Component recall | Framework available; evaluation needs completion | Not run |
-| Connection precision | Limited by component correspondence | Not run |
-| Connection recall | Limited by component correspondence | Not run |
-
-No passing thresholds have been experimentally established.
-
-### Metric definitions
-
-- **Normalized Edit Distance:** Measures normalized graph-edit differences between predicted and ground-truth netlists.
-- **Graph-isomorphism accuracy:** Measures whether predicted and ground-truth circuit graphs have equivalent structures.
-- **Component precision:** Measures the proportion of predicted components that match ground-truth components.
-- **Component recall:** Measures the proportion of ground-truth components successfully matched.
-- **Connection precision:** Measures the proportion of predicted connections that match ground-truth connections.
-- **Connection recall:** Measures the proportion of ground-truth connections successfully recovered.
-
-Component matching currently uses Hungarian assignment, canonical categories, and a provisional centre-distance threshold of 10 pixels.
-
-Connection matching currently depends on full graph isomorphism for component correspondence. Consequently, it cannot independently quantify connection errors when the graphs are not isomorphic.
-
-All real-data metrics must be generated through actual evaluation runs and saved with their configuration, seed, and Git commit hash. Metrics that have not been computed must remain marked `not run`.
-
-## 8. Project Structure
-
-```text
-verified-circuit-access/
-├── DATASETS.md
-├── PLAN.md
-├── README.md
-├── Makefile
-├── pyproject.toml
-├── uv.lock
-├── .env.example
-├── src/
-│   └── vca/
-│       ├── schemas/
-│       │   ├── annotation.py
-│       │   ├── netlist.py
-│       │   └── taxonomy.py
-│       ├── data/
-│       │   ├── image2net.py
-│       │   └── cghd.py
-│       ├── metrics/
-│       │   ├── ned.py
-│       │   └── graph_iso.py
-│       ├── baseline/
-│       │   ├── provider.py
-│       │   ├── interface.py
-│       │   ├── evaluation.py
-│       │   ├── overlay.py
-│       │   ├── results.py
-│       │   └── errors.py
-│       ├── detect/       # M2
-│       ├── classify/     # M2
-│       ├── netting/      # M2
-│       ├── verify/       # M2
-│       ├── explain/      # M3
-│       └── outputs/      # M3
-└── tests/
-    ├── schemas/
-    ├── data/
-    ├── metrics/
-    └── baseline/
+```bash
+ruff format --check .
 ```
 
-Dataset files and generated evaluation results are excluded from version control according to `.gitignore`.
+These commands verify the current codebase. The reported historical test count should not be assumed if the implementation or dependencies have changed.
 
-## 9. Reproducibility and Project Rules
+## 15. Makefile commands
 
-The project follows these rules:
+The repository currently defines the following Makefile targets:
 
-- Use Python 3.11 and pinned dependencies.
-- Use real datasets only after explicit approval.
-- Never generate synthetic training or evaluation images or labels.
-- Do not commit dataset images, copyrighted textbook material, API credentials, or generated evaluation results.
-- Record configuration, random seed, and Git commit hash for actual evaluation runs.
-- Report uncomputed metrics as `not run`.
-- Keep M2 and M3 functionality separate from M1 until those milestones are explicitly approved.
-- Keep gated datasets inaccessible until their licensing and access requirements are resolved.
-- Do not fabricate predicted bounding boxes or numeric circuit results.
+```bash
+make data
+make train
+make eval
+make demo
+```
 
-## 10. Current Project Status
+These targets are placeholders at the current milestone.
 
-**Current milestone: M1 — Data Audit and Baseline**
+They intentionally stop with explanatory messages rather than performing incomplete or unsafe operations.
 
-The repository currently contains:
+| Target | Current behavior |
+|---|---|
+| `make data` | Stops; data preparation is not implemented |
+| `make train` | Stops; training is not implemented |
+| `make eval` | Stops; evaluation requires explicit approvals |
+| `make demo` | Stops; demo is not implemented |
 
-- Pydantic annotation and netlist schemas.
-- A harmonized component taxonomy.
-- Image2Net validation data integration and loaders.
-- A deliberately gated CGHD loader.
-- Graph-isomorphism evaluation.
-- Canonical normalized graph edit distance.
-- A provider-independent VLM baseline interface.
-- A preliminary evaluation and results-storage framework.
-- Automated tests and lint checks.
+Do not interpret the existence of these targets as evidence that the corresponding workflows are operational.
 
-Latest software verification:
+## 16. Dataset and model approval requirements
 
-- 117 tests passed.
-- Ruff checks passed.
-- Latest NED implementation commit: `722c40b`.
+Dataset approval and real VLM provider approval are separate requirements.
 
-### Remaining M1 work
+- Dataset access must follow the conditions documented in `DATASETS.md`.
+- Real dataset usage must not bypass licensing or access restrictions.
+- Real model-provider calls require explicit approval.
+- Mock-provider tests do not require real API credentials.
+- CGHD remains gated and must not be accessed until its requirements have been resolved.
 
-1. Complete and verify the dataset audit.
-2. Verify the unified COCO annotation format and taxonomy coverage across approved datasets.
-3. Implement and validate Image2Net-compatible GED separately from canonical NED.
-4. Complete independent component and connection precision/recall evaluation.
-5. Select and integrate a real VLM provider.
-6. Run the baseline evaluation on the approved labelled circuits.
-7. Save actual metrics, experiment metadata, and failure-case overlays.
-8. Complete the README and Makefile reproduction workflow.
+The evaluation framework must not silently substitute synthetic data or mock predictions for real evaluation data.
 
-M1 does not yet provide a trained circuit detector, a completed real VLM evaluation, or accessible circuit explanations.
+## 17. Development principles
 
-M2 will build the models that extract and verify circuit information from images. M3 will use the verified circuit representation to generate explanations and accessible outputs for blind students.
+The project follows these principles:
 
-**M2 and M3 remain planned. Work on them will begin only after M1 is completed and explicitly approved.**
+1. **Structured representation:** Circuit information should be represented through validated schemas and graph structures.
+2. **Traceability:** Predictions and evaluation results should retain their provenance.
+3. **Verification:** Explanations should be grounded in verified circuit information.
+4. **No fabricated evidence:** Missing spatial, terminal, or numerical evidence must not be invented.
+5. **Reproducibility:** Dependencies, configurations, seeds, and source versions should be recorded.
+6. **Dataset compliance:** Data access and licensing requirements must be respected.
+7. **Accessibility:** The final system should support non-visual understanding of circuit diagrams.
 
-See `PLAN.md` for the complete milestone plan and `DATASETS.md` for dataset approval details.
+## 18. Current limitations and future work
+
+The current implementation establishes the data, schema, graph, metric, and baseline-evaluation foundations.
+
+The following work remains:
+
+- Complete the extraction pipeline for circuit diagram images.
+- Develop and train the component and connection verification model.
+- Calibrate verification confidence and establish teacher-review thresholds.
+- Integrate ngspice for numerical circuit verification.
+- Ground generated explanations in verified graph structures and simulation outputs.
+- Develop layered explanations for different levels of understanding.
+- Generate screen-reader-compatible descriptions.
+- Support Braille-compatible output.
+- Develop tactile circuit diagram representations.
+- Evaluate downstream comprehension with an appropriate real evaluation dataset.
+
+These are future implementation goals, not completed capabilities.
+
+## 19. Documentation
+
+Additional project documentation:
+
+- `DATASETS.md` — Dataset sources, licensing, access, and audit information.
+- `PLAN.md` — Project milestones and implementation plan.
+
+For implementation details, refer to the corresponding modules under `src/vca/`.
+
+---
+
+**Project:** VERIFIED-CIRCUIT-ACCESS
+**Current milestone:** M1 — Foundational implementation and evaluation infrastructure
+**Repository:** https://github.com/niksi-nova/verified-circuit-access
