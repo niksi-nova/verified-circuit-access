@@ -131,3 +131,19 @@ def test_duplicate_net_names(valid_netlist_data):
 
     with pytest.raises(ValidationError, match="Duplicate net name"):
         Netlist(**valid_netlist_data)
+
+def test_single_endpoint_net_is_valid(valid_netlist_data):
+    valid_netlist_data["nets"][0]["endpoints"] = [
+        {"component_id": "R1", "terminal_name": "2"}
+    ]
+
+    netlist = Netlist(**valid_netlist_data)
+
+    assert len(netlist.nets[0].endpoints) == 1
+
+
+def test_empty_net_is_invalid(valid_netlist_data):
+    valid_netlist_data["nets"][0]["endpoints"] = []
+
+    with pytest.raises(ValidationError):
+        Netlist(**valid_netlist_data)

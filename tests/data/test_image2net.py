@@ -213,3 +213,31 @@ def test_validation_netlist_missing_field_raises_value_error(tmp_path):
 
     with pytest.raises(ValueError, match="ckt_netlist"):
         load_validation_netlist(path)
+
+
+def test_validation_netlist_accepts_image2net_object_format(tmp_path):
+    path = tmp_path / "image2net.json"
+    path.write_text(
+        """
+        {
+            "ckt_netlist": [
+                {
+                    "component_type": "Res",
+                    "port_connection": {
+                        "Pos": "VDD",
+                        "Neg": "net1"
+                    }
+                }
+            ],
+            "ckt_type": "TestCircuit"
+        }
+        """,
+        encoding="utf-8",
+    )
+
+    result = load_validation_netlist(path)
+
+    assert len(result) == 1
+    assert len(result[0].components) == 1
+    assert {net.name for net in result[0].nets} == {"VDD", "net1"}
+    assert all(len(net.endpoints) == 1 for net in result[0].nets)

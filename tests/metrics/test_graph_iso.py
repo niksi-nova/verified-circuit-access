@@ -140,3 +140,61 @@ def test_accuracy_for_mixed_pairs():
     )
 
     assert accuracy == 0.5
+
+def test_multiple_terminals_on_same_net_are_preserved():
+    predicted = Netlist(
+        components=[
+            Component(
+                id="R1",
+                canonical_category="resistor",
+                terminals=[
+                    Terminal(name="1"),
+                    Terminal(name="2"),
+                ],
+            ),
+            Component(
+                id="C1",
+                canonical_category="capacitor",
+                terminals=[Terminal(name="1")],
+            ),
+        ],
+        nets=[
+            Net(
+                name="N1",
+                endpoints=[
+                    NetEndpoint(component_id="R1", terminal_name="1"),
+                    NetEndpoint(component_id="R1", terminal_name="2"),
+                    NetEndpoint(component_id="C1", terminal_name="1"),
+                ],
+            )
+        ],
+    )
+
+    ground_truth = Netlist(
+        components=[
+            Component(
+                id="R1",
+                canonical_category="resistor",
+                terminals=[
+                    Terminal(name="1"),
+                    Terminal(name="2"),
+                ],
+            ),
+            Component(
+                id="C1",
+                canonical_category="capacitor",
+                terminals=[Terminal(name="1")],
+            ),
+        ],
+        nets=[
+            Net(
+                name="N1",
+                endpoints=[
+                    NetEndpoint(component_id="R1", terminal_name="2"),
+                    NetEndpoint(component_id="C1", terminal_name="1"),
+                ],
+            )
+        ],
+    )
+
+    assert not are_isomorphic(predicted, ground_truth)

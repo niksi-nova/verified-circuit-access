@@ -51,7 +51,7 @@ class Net(BaseModel):
     """An electrical net connecting component terminals."""
 
     name: str
-    endpoints: list[NetEndpoint] = Field(min_length=2)
+    endpoints: list[NetEndpoint] = Field(min_length=1)
 
     @model_validator(mode="after")
     def validate_unique_endpoints(self):

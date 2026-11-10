@@ -14,9 +14,9 @@ from networkx.algorithms import isomorphism
 from vca.schemas.netlist import Netlist
 
 
-def _build_graph(netlist: Netlist) -> nx.Graph:
+def _build_graph(netlist: Netlist) -> nx.MultiGraph:
     """Build a canonical bipartite incidence graph from a netlist."""
-    graph = nx.Graph()
+    graph = nx.MultiGraph()
 
     # Component nodes
     for component in netlist.components:

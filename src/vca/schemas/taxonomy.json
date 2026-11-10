@@ -1,4 +1,3 @@
-
 {
   "entries": [
     {"dataset_name": "Image2Net", "source_label": "antenna", "canonical_name": "antenna", "canonical_id": 1},
@@ -31,7 +30,36 @@
     {"dataset_name": "Image2Net", "source_label": "switch-3", "canonical_name": "switch", "canonical_id": 28, "equivalence_note": "Switch variant"},
     {"dataset_name": "Image2Net", "source_label": "vdd", "canonical_name": "vdd", "canonical_id": 29},
     {"dataset_name": "Image2Net", "source_label": "voltage", "canonical_name": "voltage", "canonical_id": 30},
-    {"dataset_name": "Image2Net", "source_label": "voltage-lines", "canonical_name": "voltage-lines", "canonical_id": 31}
+    {"dataset_name": "Image2Net", "source_label": "voltage-lines", "canonical_name": "voltage-lines", "canonical_id": 31},
+    {"dataset_name": "Image2Net", "source_label": "Res", "canonical_name": "resistor", "canonical_id": 32, "equivalence_note": "Image2Net validation netlist label"},
+    {
+      "dataset_name": "Image2Net",
+      "source_label": "Cap",
+      "canonical_name": "capacitor",
+      "canonical_id": 33,
+      "equivalence_note": "Image2Net validation netlist label"
+    },
+    {
+      "dataset_name": "Image2Net",
+      "source_label": "Diso_amp",
+      "canonical_name": "diff-amp",
+      "canonical_id": 34,
+      "equivalence_note": "Two differential inputs and one output"
+    },
+    {
+      "dataset_name": "Image2Net",
+      "source_label": "Dido_amp",
+      "canonical_name": "differential-amplifier",
+      "canonical_id": 35,
+      "equivalence_note": "Two differential inputs and two differential outputs"
+    },
+    {
+      "dataset_name": "Image2Net",
+      "source_label": "Siso_amp",
+      "canonical_name": "single-input-single-end-amp",
+      "canonical_id": 36,
+      "equivalence_note": "One input and one output"
+    }
   ],
   "unmapped_labels": []
 }

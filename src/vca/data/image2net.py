@@ -221,8 +221,12 @@ def load_validation_netlist(path: Path) -> list[Netlist]:
     except OSError as exc:
         raise ValueError(f"{path}: unable to read file") from exc
 
-    if not isinstance(data, list):
-        raise ValueError(f"{path}: root must be a list")
+    if isinstance(data, dict):
+        data = [data]
+    elif not isinstance(data, list):
+        raise ValueError(
+            f"{path}: root must be an object or a list of circuits"
+        )
 
     netlists = []
 
