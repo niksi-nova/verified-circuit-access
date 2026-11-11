@@ -96,17 +96,19 @@ def test_different_component_categories_contribute_to_ged():
     assert compute_ned(predicted, ground_truth) > 0.0
 
 
-def test_different_terminal_labels_contribute_to_ged():
-    predicted = Netlist(
+def _two_terminal(category: str, swap: bool) -> Netlist:
+    first, second = ("2", "1") if swap else ("1", "2")
+    return Netlist(
         components=[
+            # Polar anchor so swapping X1 cannot be undone by relabelling nets.
             Component(
                 id="R1",
-                canonical_category="resistor",
+                canonical_category="nmos",
                 terminals=[Terminal(name="1"), Terminal(name="2")],
             ),
             Component(
-                id="C1",
-                canonical_category="capacitor",
+                id="X1",
+                canonical_category=category,
                 terminals=[Terminal(name="1"), Terminal(name="2")],
             ),
         ],
@@ -115,48 +117,34 @@ def test_different_terminal_labels_contribute_to_ged():
                 name="N1",
                 endpoints=[
                     NetEndpoint(component_id="R1", terminal_name="1"),
-                    NetEndpoint(component_id="C1", terminal_name="1"),
+                    NetEndpoint(component_id="X1", terminal_name=first),
                 ],
             ),
             Net(
                 name="N2",
                 endpoints=[
                     NetEndpoint(component_id="R1", terminal_name="2"),
-                    NetEndpoint(component_id="C1", terminal_name="2"),
+                    NetEndpoint(component_id="X1", terminal_name=second),
                 ],
             ),
         ],
     )
 
-    ground_truth = Netlist(
-        components=[
-            Component(
-                id="R1",
-                canonical_category="resistor",
-                terminals=[Terminal(name="1"), Terminal(name="2")],
-            ),
-            Component(
-                id="C1",
-                canonical_category="capacitor",
-                terminals=[Terminal(name="1"), Terminal(name="2")],
-            ),
-        ],
-        nets=[
-            Net(
-                name="N1",
-                endpoints=[
-                    NetEndpoint(component_id="R1", terminal_name="1"),
-                    NetEndpoint(component_id="C1", terminal_name="2"),
-                ],
-            ),
-            Net(
-                name="N2",
-                endpoints=[
-                    NetEndpoint(component_id="R1", terminal_name="2"),
-                    NetEndpoint(component_id="C1", terminal_name="1"),
-                ],
-            ),
-        ],
-    )
+
+def test_different_terminal_labels_contribute_to_ged():
+    # A diode is polar: swapping its terminals changes the topology.
+    predicted = _two_terminal("diode", swap=False)
+    ground_truth = _two_terminal("diode", swap=True)
 
     assert compute_ned(predicted, ground_truth) > 0.0
+
+
+@pytest.mark.parametrize(
+    "category", ["resistor", "capacitor", "inductor", "switch"]
+)
+def test_symmetric_passive_orientation_is_ignored(category):
+    # Matches Image2Net's official script: passives have one edge type.
+    predicted = _two_terminal(category, swap=False)
+    ground_truth = _two_terminal(category, swap=True)
+
+    assert compute_ned(predicted, ground_truth) == pytest.approx(0.0)

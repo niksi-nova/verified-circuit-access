@@ -225,11 +225,11 @@ def test_correct_prediction_is_classified_correct(
     assert result.metrics.per_pair[0].graph_isomorphism is True
 
 
-def test_missing_component_without_localization_is_not_evaluated(
+def test_missing_component_is_classified_from_alignment(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """A netlist mismatch without predicted boxes is not classifiable."""
+    """A dropped component is reported as missed via graph alignment."""
     monkeypatch.setenv("MOCK_VLM_API_KEY", "test-key")
 
     image_dir = tmp_path / "images"
@@ -288,18 +288,24 @@ def test_missing_component_without_localization_is_not_evaluated(
     )
 
     assert provider.call_count == 1
-    assert result.circuits[0].failure_categories == ["not_evaluated"]
+    circuit = result.circuits[0]
+    # One resistor is gone; the kept one lost its nets (prediction has none).
+    assert circuit.failure_categories == ["missed_component", "wrong_connection"]
     assert result.metrics.per_pair[0].graph_isomorphism is False
+    assert result.metrics.per_pair[0].component_recall == 0.5
+    assert result.error_counts == {"missed_component": 1, "wrong_connection": 1}
 
-    # No ground-truth spatial annotations were supplied.
-    assert not (output_dir / "overlays").exists()
+    # Failures always get an overlay, even without ground-truth boxes.
+    assert len(list(output_dir.rglob("*_overlay.png"))) == 1
+    # The raw prediction is saved for re-scoring.
+    assert len(list(output_dir.rglob("predictions/circuit_001.json"))) == 1
 
 
 def test_overlay_and_manifest_are_generated_for_failure_case(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """A non-evaluated prediction still produces a GT-only overlay."""
+    """A failed prediction produces an overlay with a legend panel."""
     monkeypatch.setenv("MOCK_VLM_API_KEY", "test-key")
 
     (
@@ -329,16 +335,15 @@ def test_overlay_and_manifest_are_generated_for_failure_case(
     )
 
     assert provider.call_count == 1
-    assert result.circuits[0].failure_categories == ["not_evaluated"]
+    assert "missed_component" in result.circuits[0].failure_categories
 
-    # Verify overlay exists and retains the input image dimensions.
-    overlay_path = (
-        output_dir / "overlays" / "circuit_001_overlay.png"
-    )
-    assert overlay_path.is_file()
+    # The overlay keeps the image width and adds a legend strip below it.
+    overlays = list(output_dir.rglob("circuit_001_overlay.png"))
+    assert len(overlays) == 1
 
-    with Image.open(overlay_path) as overlay:
-        assert overlay.size == (300, 150)
+    with Image.open(overlays[0]) as overlay:
+        assert overlay.width == 300
+        assert overlay.height > 150
 
     # Verify manifest.
     manifest_files = list(
@@ -469,3 +474,41 @@ def test_repeated_run_preserves_metrics_config_and_manifest(
         assert (
             manifest_path.parent / f"{run_id}_metrics.config.json"
         ).is_file()
+
+
+def test_saved_predictions_can_be_rescored_without_vlm_calls(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Passing predictions_dir re-scores saved predictions offline."""
+    monkeypatch.setenv("MOCK_VLM_API_KEY", "test-key")
+
+    image_dir, netlist_dir, output_dir, _, netlist_path, _ = (
+        _create_evaluation_inputs(tmp_path)
+    )
+    ground_truth = _load_ground_truth(netlist_path)
+
+    first = LocalMockProvider(response=ground_truth.model_dump_json())
+    run_evaluation(
+        image_dir=image_dir,
+        netlist_dir=netlist_dir,
+        vlm=VLMInterface(provider=first),
+        output_dir=output_dir,
+        data_approved=True,
+        vlm_approved=True,
+    )
+    saved = next(output_dir.rglob("predictions")).resolve()
+
+    second = LocalMockProvider(response="not json")
+    result = run_evaluation(
+        image_dir=image_dir,
+        netlist_dir=netlist_dir,
+        vlm=VLMInterface(provider=second),
+        output_dir=tmp_path / "rescored",
+        data_approved=True,
+        vlm_approved=True,
+        predictions_dir=saved,
+    )
+
+    assert second.call_count == 0
+    assert result.circuits[0].failure_categories == ["correct"]

@@ -77,6 +77,11 @@ verified-circuit-access/
 
 ### M1 — Data audit and baseline (next, pending approval of this plan)
 
+**Status:** implementation complete (data download, schemas and loaders,
+metrics, Claude baseline provider, evaluation CLI, `make data` / `make eval`).
+The full baseline run on the 122 Image2Net validation circuits is pending;
+no baseline numbers are reported until it has run.
+
 - `DATASETS.md`: official source, license, size, annotation format, intended
   use, and risk for each of CGHD, Image2Net, AMSnet 2.0, Masala-CHAI
   (weak labels only, never for evaluation), SINA, CircuitReason-1k.

@@ -5,7 +5,9 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-from vca.schemas.annotation import AnnotationRecord
+from vca.schemas.annotation import AnnotationRecord, BoundingBox
+
+Color = tuple[int, int, int]
 
 
 def _draw_dashed_rectangle(
@@ -62,15 +64,49 @@ def render_overlay(
     predicted_annotations: list[AnnotationRecord],
     output_path: str | Path,
     legend_lines: list[str] | None = None,
+    labelled_boxes: list[tuple[BoundingBox, str, Color]] | None = None,
+    legend_panel: bool = False,
 ) -> Path:
-    """Render bounding boxes and an optional text legend."""
+    """Render bounding boxes and an optional text legend.
+
+    ``labelled_boxes`` draws extra boxes (e.g. VLM-estimated component
+    locations) with a text tag. With ``legend_panel`` the legend goes in a
+    white strip below the image instead of covering its top.
+    """
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     with Image.open(image_path) as source:
         image = source.convert("RGB").copy()
 
+    line_height = 16
+    padding = 6
+
+    if legend_panel and legend_lines:
+        panel_height = len(legend_lines) * line_height + 2 * padding
+        canvas = Image.new(
+            "RGB", (image.width, image.height + panel_height), (255, 255, 255)
+        )
+        canvas.paste(image, (0, 0))
+        draw = ImageDraw.Draw(canvas)
+        for index, line in enumerate(legend_lines):
+            draw.text(
+                (padding, image.height + padding + index * line_height),
+                line,
+                fill=(0, 0, 0),
+            )
+        legend_lines = None
+        image = canvas
+
     draw = ImageDraw.Draw(image)
+
+    for bbox, label, color in labelled_boxes or []:
+        draw.rectangle(
+            (bbox.x, bbox.y, bbox.x + bbox.width, bbox.y + bbox.height),
+            outline=color,
+            width=3,
+        )
+        draw.text((bbox.x + 2, max(bbox.y - line_height, 0)), label, fill=color)
 
     # Ground-truth boxes: solid green.
     for annotation in ground_truth_annotations:
@@ -102,8 +138,6 @@ def render_overlay(
 
     # Optional legend for predictions without spatial annotations.
     if legend_lines:
-        line_height = 16
-        padding = 6
         legend_height = len(legend_lines) * line_height + 2 * padding
 
         draw.rectangle(

@@ -18,6 +18,9 @@ from vca.schemas.netlist import Netlist
 class PerPairMetrics(BaseModel):
     """Metrics calculated for a single circuit pair."""
 
+    circuit_id: str | None = None
+    # False when the GED search timed out and ``ned`` is an upper bound.
+    ned_exact: bool | None = None
     ned: float | None
     graph_isomorphism: bool | None
     component_precision: float | None

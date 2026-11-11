@@ -23,35 +23,26 @@ confirm the flagged items directly instead of relying on search snippets.
   [github.com/DFKI/cghd](https://github.com/DFKI/cghd) (read directly).
   Underlying paper: Thoma, Bayer, Li, Dengel, "A Public Ground-Truth Dataset
   for Handwritten Circuit Diagram Images," ICDAR 2021 (arXiv 2402.11093).
-- **License: UNCLEAR — conflicting signals across sources, not resolved.**
-  - Task brief states the Zenodo record is "CC BY 4.0" — **not independently
-    verified**; `zenodo.org` is network-blocked in this session, so the
-    license field on the record page itself has not been read directly.
-  - The GitHub companion repo's `LICENSE` file (read directly, HTTP 200) is
-    the full text of **CC0 1.0 Universal**.
-  - A Hugging Face mirror (`lowercaseonly/cghd`, found via search snippet
-    only, not fetched directly) lists `license: cc-by-3.0`.
-  - Three different licenses (CC BY 4.0 claimed, CC0 on GitHub, CC BY 3.0 on
-    HF) attach to what may be different versions/packagings of the same
-    dataset family — the GitHub repo's file layout (`drafter_D/` folders,
-    PASCAL VOC XML, no total counts, README says "still being extended...
-    under construction") does not match the Zenodo v15333233 record's
-    stated contents (248,020 bbox annotations, 59 classes, 320 segmentation
-    maps, 22,929 polygon annotations, single 4.9 GB zip), so they may not be
-    the same release. **Do not assume a license until the actual Zenodo
-    record page is read directly.**
-- **Size:** 4.9 GB, single zip (per Zenodo search snippet, not independently
-  confirmed by direct read).
+- **License:** CC BY 4.0, read from the Zenodo record API
+  (`zenodo.org/api/records/15333233`, version 15, published 2025-05-03).
+  The GitHub companion repo carries CC0 1.0 and an HF mirror lists CC BY
+  3.0; we use the Zenodo release, so CC BY 4.0 (attribution) applies.
+- **Size:** `cghd-zenodo-15.zip`, 4,874,782,260 bytes,
+  MD5 `26f6e8d48fa8174e23ff5c072ca07c7f` (from the record API; checked on
+  download). Fetched by `make data-train` into `data/cghd/`.
+  Extracted: 33 `drafter_*` folders, 8,091 files (5.0 GB), 3,269 PASCAL VOC
+  files. `vca.data.cghd.load_pascal_voc` parses all of them into 248,019
+  boxes across 59 classes (40,711 with a rotation); one zero-area `text`
+  box in `drafter_0/C1_D37_P1.xml` is skipped, which accounts for the
+  record's stated 248,020. The 59 CGHD classes are not yet mapped to the
+  canonical taxonomy (M2). 12 LTspice `.asc` netlists are included.
 - **Annotation format:** Bounding boxes (59 object classes), binary
   segmentation maps, polygon annotations (per Zenodo snippet). The GitHub
   mirror's older packaging uses PASCAL VOC XML per-image, plus LTspice
   `.asc` netlists for some images, plus `classes.json` class-to-int mapping.
 - **Intended use:** Training/evaluating models that extract electrical
   graphs (components, wires) from raster images of hand-drawn circuits.
-- **Risk:** License ambiguity (above) must be resolved by reading the
-  Zenodo page directly before any use, including training. Size (4.9 GB)
-  exceeds the 1 GB download-confirmation threshold in the project's data
-  download rules.
+- **Risk:** Low for research use; cite the ICDAR 2021 paper.
 
 ## 2. Image2Net (`ci2n_datasets`)
 
@@ -82,8 +73,17 @@ confirm the flagged items directly instead of relying on search snippets.
   {"Drain": "net8", ...}}`. Files are tracked directly in the git repo
   (no git-lfs or external host mentioned).
 - **Intended use:** Training detector/orientation/crossing classifiers; the
-  104 netlist-labelled circuits are our evaluation set for extraction
+  netlist-labelled circuits are our evaluation set for extraction
   metrics (netlist edit distance, graph isomorphism, precision/recall).
+- **Count actually used:** at the pinned commit
+  `2ffd41b2255726eb1be215fa7ba1d9808c80c808`, `validation/` contains **122**
+  image/golden pairs, not the paper's 104. We evaluate all 122 (54
+  DISO-Amplifier, 24 Bandgap, 21 DIDO-Amplifier, 9 LDO, 7 SISO-Amplifier,
+  7 Comparator) and record the count with each run.
+- **Training subsets downloaded** (`make data-train`, same pinned commit,
+  into `data/image2net/train/`): `device_identification/` 2,269 images +
+  2,269 Labelme JSON; `device_orientation/` 12,554 crops in 8 class
+  folders; `jumper_identification/` 855 images + 855 YOLO-OBB label files.
 - **Risk:** Low. Public repo, explicit Apache-2.0, no access restriction.
   Residual risk is the unnamed "applicable data licenses" caveat on
   original source material — worth re-checking if we ever redistribute
@@ -236,7 +236,7 @@ confirm the flagged items directly instead of relying on search snippets.
 | Dataset | Status | Why |
 |---|---|---|
 | Image2Net (`ci2n_datasets`) | **Clearly open** (with a minor caveat) | Apache-2.0 on the repo, public, no access restriction. Caveat: README references unnamed "applicable data licenses" for original source material. |
-| CGHD | **Unclear** | Three different licenses found across three sources (CC BY 4.0 claimed / CC0 on GitHub mirror / CC BY 3.0 on HF mirror) for what may not even be the same dataset version. Needs a direct read of the actual Zenodo record (network-blocked this session). |
+| CGHD | **CC BY 4.0** | Read from the Zenodo record API (version 15). Downloaded and MD5-checked; cite the ICDAR 2021 paper. |
 | AMSnet 2.0 | **Gated / unclear** | No license or confirmed public download found anywhere in available sources (network-blocked; only search snippets available). As anticipated in the brief. |
 | Masala-CHAI | **Unclear** | Authors claim "open-source" but no repo URL, license name, or dataset card located; project page network-blocked. Also: weak-labels-only, never-evaluation, by project policy regardless of license outcome. |
 | SINA | **Unclear** | Both papers confirmed to exist and match the topic, but no license or repo URL found in available snippets; arxiv.org network-blocked for a direct read. |

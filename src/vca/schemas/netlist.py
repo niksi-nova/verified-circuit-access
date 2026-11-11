@@ -2,6 +2,8 @@ import re
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+from vca.schemas.annotation import BoundingBox
+
 TERMINAL_PATTERN = re.compile(r"^[a-zA-Z0-9_-]+$")
 
 
@@ -22,11 +24,17 @@ class Terminal(BaseModel):
 
 
 class Component(BaseModel):
-    """A circuit component with a unique identifier."""
+    """A circuit component with a unique identifier.
+
+    ``bbox`` is optional pixel-space location (COCO [x, y, w, h]). Golden
+    Image2Net netlists have none; predictors may supply one so that errors
+    can be drawn on the image and, in M2, tied to detections.
+    """
 
     id: str
     canonical_category: str
     terminals: list[Terminal] = Field(min_length=1)
+    bbox: BoundingBox | None = None
 
     @model_validator(mode="after")
     def validate_unique_terminal_names(self):

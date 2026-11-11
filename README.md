@@ -58,10 +58,10 @@ The repository currently contains the foundational implementation for Milestone 
 | Component taxonomy | Implemented |
 | Image2Net dataset integration | Implemented |
 | Dataset taxonomy audit | Implemented |
-| CGHD dataset integration | Gated stub |
+| CGHD PASCAL VOC box loader | Implemented (LTspice netlists: M2) |
 | Graph isomorphism metric | Implemented |
 | Normalized graph edit distance (NED) | Implemented |
-| VLM baseline interface | Implemented |
+| VLM baseline (Claude provider + CLI) | Implemented |
 | Evaluation framework | Implemented |
 | Evaluation overlays | Implemented |
 | Results storage | Implemented |
@@ -70,7 +70,7 @@ The repository currently contains the foundational implementation for Milestone 
 | Accessible explanation generation | Future implementation |
 | Screen-reader, Braille, and tactile output | Future implementation |
 
-**Important:** Implemented infrastructure does not imply that a trained model or complete end-to-end system is available. Model training and real evaluation results have not yet been established.
+**Important:** Implemented infrastructure does not imply that a trained model or complete end-to-end system is available. No model has been trained, and no baseline numbers are reported until the evaluation in section 12 has been run.
 
 ## 5. Technology stack
 
@@ -162,7 +162,9 @@ The local validation dataset contains:
 
 - 122 circuit diagram images.
 - 122 corresponding golden JSON annotation files.
-- A local manifest recording dataset information.
+- A local manifest recording each file's SHA-256.
+
+The Image2Net paper reports 104 verified pairs; the repository's `validation/` folder holds 122 at the pinned commit. The baseline is evaluated on all 122, and the count is recorded with every run.
 
 The dataset is stored under:
 
@@ -187,21 +189,17 @@ The dataset-wide taxonomy audit covered 1,573 components and found zero unknown 
 
 Dataset access and licensing conditions are documented in `DATASETS.md`.
 
-The Image2Net validation data is used under the approved academic/non-commercial access conditions established for this project.
+This is a research project; licensing notes are kept in `DATASETS.md` for reference.
 
-The dataset is not distributed through this repository. A fresh clone does not automatically contain the downloaded images or annotation files.
-
-To obtain the validation data, follow the access and licensing requirements documented in `DATASETS.md`.
+The dataset is not distributed through this repository. A fresh clone does not contain the images or annotation files; download them as below.
 
 ### Downloading the validation data
 
-After satisfying the documented dataset access requirements, run:
-
 ```bash
-python scripts/download_image2net_validation.py
+make data
 ```
 
-The script downloads/verifies the validation pairs and creates a local manifest.
+The script lists the `validation/` folder at the pinned commit, downloads every image/golden pair into `data/image2net/`, and writes the manifest.
 
 The currently verified local dataset contains 122 pairs.
 
@@ -209,11 +207,7 @@ The currently verified local dataset contains 122 pairs.
 
 ### CGHD dataset
 
-CGHD integration is currently a gated stub.
-
-The implementation deliberately raises `DatasetGatedError` rather than silently accessing or using data whose access requirements have not been satisfied.
-
-It is not currently an operational dataset loader.
+`vca.data.cghd.load_pascal_voc` parses CGHD's PASCAL VOC box files into the shared COCO-style records (`ImageRecord`, `AnnotationRecord`), keeping the raw label in `source_label` and reading `<rotation>` when present. CGHD labels not yet in the taxonomy map to `unknown` and are returned in `unmapped_labels` so they can be added deliberately. LTspice `.asc` netlist conversion is part of M2.
 
 ## 8. Data schemas
 
@@ -248,11 +242,11 @@ Component IDs and net names are not treated as the defining basis of graph equiv
 
 ## 10. Evaluation metrics
 
+All metrics compare the predicted and golden netlists as component-net incidence multigraphs: component nodes carry their category, net nodes are anonymous, and each edge carries the terminal name. Following Image2Net, two-terminal devices without polarity (resistor, capacitor, inductor, switch) use a single terminal label, so drawing them backwards is not an error; polar devices (MOS drain/source, diode, sources, amplifier inputs) keep distinct labels.
+
 ### 10.1 Graph isomorphism
 
-The graph isomorphism implementation evaluates whether two circuit graph representations have equivalent structures under the implemented matching rules.
-
-It provides a structural comparison of the predicted and ground-truth representations.
+A prediction is correct when its graph is isomorphic to the golden graph with matching categories and terminal labels on every edge.
 
 Implementation:
 
@@ -262,7 +256,7 @@ src/vca/metrics/graph_iso.py
 
 ### 10.2 Normalized graph edit distance (NED)
 
-The project implements a canonical normalized graph edit distance metric.
+NED follows Image2Net's definition: the graph edit distance with unit costs, divided by the size of the golden graph (components + nets + terminal connections). 0 is a perfect match.
 
 Implementation:
 
@@ -272,20 +266,13 @@ src/vca/metrics/ned.py
 
 The metric compares canonical component-net incidence graphs using graph edit operations.
 
-The implemented operations include:
+Exact GED is NP-hard. The search (`networkx.optimize_edit_paths`) runs until a timeout (30 s by default); if it stops early, the best path found so far is used, so that circuit's NED is an upper bound and is flagged `ned_exact: false` in the results.
 
-- Node insertion and deletion.
-- Edge insertion and deletion.
-- Node substitution.
-- Edge substitution.
+The same best edit path gives a node alignment between prediction and golden circuit. That alignment drives:
 
-Substitution costs distinguish component categories, node types, and terminal labels.
-
-The result is normalized using the ground-truth graph size, including its component nodes, net nodes, and endpoint edges.
-
-An empty ground-truth graph produces no score. A graph edit distance computation that exceeds its timeout also produces no score.
-
-**Metric distinction:** This is the project's canonical NED implementation. It should not be described as an exact reproduction of Image2Net's original graph edit distance implementation.
+- **Component precision/recall:** aligned components with the same category.
+- **Connection precision/recall:** nets whose aligned terminal sets match exactly.
+- **Error diagnosis** per circuit: `missed_component`, `extra_component`, `wrong_component_type`, `wrong_polarity` (same terminals and nets, assigned the wrong way round, e.g. drain/source swapped), `wrong_connection`.
 
 ### 10.3 Evaluation framework
 
@@ -305,7 +292,7 @@ src/vca/baseline/overlay.py
 src/vca/baseline/results.py
 ```
 
-A complete trained-model evaluation has not yet been performed.
+Each run writes to `results/baseline/<run_id>/`: the raw prediction for every circuit (so a run can be re-scored without new API calls) and an overlay image for every incorrect circuit, with predicted boxes labelled by error kind.
 
 ## 11. VLM baseline infrastructure
 
@@ -332,9 +319,13 @@ src/vca/baseline/
 └── results.py
 ```
 
-The provider interface is intended to allow different model providers to be integrated without changing the evaluation framework.
+The baseline provider is `anthropic_provider.py`: one Claude call per image (default `claude-opus-5-5`, effort `high`), with structured outputs constraining the reply to the netlist schema, category and terminal names restricted to the taxonomy, and component boxes returned as fractions of the image and converted to pixels. Invalid replies are retried with the validation error as context (`--max-retries`, default 3). Refusals and truncated replies count as failed attempts.
 
-A mock provider can be used for infrastructure-level testing. It must not be treated as a real model prediction or as evidence of model performance.
+Server-side model fallbacks are deliberately not enabled: they could silently answer with a different model and confound the baseline. The served model and token counts of every call are saved in `<run_id>_calls.json`.
+
+Claude models do not expose sampling temperature, so two runs are not bit-for-bit identical; the saved predictions are the record of what was scored.
+
+A mock provider is used only in tests. It must not be treated as evidence of model performance.
 
 Predictions that do not contain bounding-box information must not be assigned fabricated bounding boxes. Some spatial or terminal-orientation evaluations may therefore be marked as not evaluated when the required evidence is unavailable.
 
@@ -358,13 +349,12 @@ No model-performance metrics should be interpreted as established until an actua
 
 | Verification | Status |
 |---|---|
-| Full automated test suite | 117 passed |
-| NED unit tests | 6 passed |
+| Full automated test suite | 139 passed |
 | Ruff checks | Passed |
 | Dataset validation pairs | 122 downloaded/verified locally |
 | Dataset taxonomy audit | 1,573 components; zero unknown labels |
 | Model training | Not run |
-| Real VLM evaluation | Not run |
+| Real VLM evaluation | Pending |
 | Circuit simulation evaluation | Not run |
 | End-to-end accessibility evaluation | Not run |
 
@@ -460,11 +450,7 @@ Use either the pip installation route or the uv installation route. There is no 
 
 ### Environment variables
 
-The repository includes an `.env.example` file for documenting future provider configuration.
-
-It does not contain real credentials.
-
-Never commit API keys, access tokens, passwords, or other secrets. Credentials should be supplied through environment variables when a real provider is integrated.
+The baseline reads `ANTHROPIC_API_KEY` from the environment (see `.env.example`, which holds only the empty variable name). Never commit API keys, access tokens, passwords, or other secrets.
 
 ## 14. Running tests and code-quality checks
 
@@ -500,35 +486,22 @@ These commands verify the current codebase. The reported historical test count s
 
 The repository currently defines the following Makefile targets:
 
-```bash
-make data
-make train
-make eval
-make demo
-```
-
-These targets are placeholders at the current milestone.
-
-They intentionally stop with explanatory messages rather than performing incomplete or unsafe operations.
-
-| Target | Current behavior |
+| Target | Behavior |
 |---|---|
-| `make data` | Stops; data preparation is not implemented |
-| `make train` | Stops; training is not implemented |
-| `make eval` | Stops; evaluation requires explicit approvals |
-| `make demo` | Stops; demo is not implemented |
-
-Do not interpret the existence of these targets as evidence that the corresponding workflows are operational.
+| `make data` | Downloads the 122 Image2Net validation pairs into `data/image2net/` |
+| `make eval` | Runs the Claude baseline on all circuits; extra flags via `ARGS="--limit 5"` |
+| `make rescore PRED=<dir>` | Re-scores saved predictions without API calls |
+| `make test` / `make lint` | pytest / ruff |
+| `make train` | Stops; training is M2 |
+| `make demo` | Stops; the accessible-output demo is M3 |
 
 ## 16. Dataset and model approval requirements
 
 Dataset approval and real VLM provider approval are separate requirements.
 
 - Dataset access must follow the conditions documented in `DATASETS.md`.
-- Real dataset usage must not bypass licensing or access restrictions.
-- Real model-provider calls require explicit approval.
+- Real model-provider calls require explicit approval (`--vlm-approved`, set by `make eval`).
 - Mock-provider tests do not require real API credentials.
-- CGHD remains gated and must not be accessed until its requirements have been resolved.
 
 The evaluation framework must not silently substitute synthetic data or mock predictions for real evaluation data.
 

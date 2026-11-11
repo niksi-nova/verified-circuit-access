@@ -119,12 +119,31 @@ def test_connection_net_names_are_ignored():
     assert connection_recall(predicted, ground_truth) == 1.0
 
 
-def test_connection_no_overlap():
+def test_connection_survives_a_mistyped_component():
     predicted = make_netlist(("P1", "P2"))
     ground_truth = make_netlist(("G1", "G2"))
 
-    # Different component categories make the graphs incompatible.
+    # Typing errors are scored by component metrics; the net still joins
+    # the same two aligned terminals, so the connection is correct.
     predicted.components[0].canonical_category = "inductor"
+
+    assert connection_precision(predicted, ground_truth) == 1.0
+    assert connection_recall(predicted, ground_truth) == 1.0
+
+
+def test_connection_no_overlap():
+    predicted = make_netlist(("P1", "P2"))
+    ground_truth = Netlist(
+        components=[
+            Component(id="G1", canonical_category="nmos",
+                      terminals=[Terminal(name="Drain")]),
+        ],
+        nets=[
+            Net(name="N1", endpoints=[
+                NetEndpoint(component_id="G1", terminal_name="Drain"),
+            ]),
+        ],
+    )
 
     assert connection_precision(predicted, ground_truth) == 0.0
     assert connection_recall(predicted, ground_truth) == 0.0
