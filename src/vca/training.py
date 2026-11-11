@@ -141,6 +141,7 @@ def train(args: argparse.Namespace) -> Path:
     model = YOLO(args.model or DEFAULT_MODELS[args.task])
     imgsz = args.imgsz or DEFAULT_IMGSZ[args.task]
 
+    overrides = {} if args.fliplr is None else {"fliplr": args.fliplr}
     model.train(
         data=str(Path(args.data).resolve()),
         epochs=args.epochs,
@@ -157,6 +158,7 @@ def train(args: argparse.Namespace) -> Path:
         exist_ok=False,
         plots=True,
         verbose=True,
+        **overrides,
     )
     run_dir = project / run_id
     best = run_dir / "weights" / "best.pt"
@@ -196,6 +198,7 @@ def train(args: argparse.Namespace) -> Path:
         "batch": args.batch,
         "patience": args.patience,
         "cache": args.cache,
+        "fliplr": args.fliplr,
         "seed": args.seed,
         "device": args.device,
         "device_name": _device_name(str(args.device)),
@@ -233,6 +236,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument(
         "--cache", choices=["ram", "disk"], default=None, help="cache decoded images"
+    )
+    parser.add_argument(
+        "--fliplr",
+        type=float,
+        default=None,
+        help="horizontal-flip probability (Ultralytics default 0.5); "
+        "0 for orientation/mirroring labels, which a flip changes",
     )
     parser.add_argument("--output-dir", default="results/m2")
     args = parser.parse_args(argv)

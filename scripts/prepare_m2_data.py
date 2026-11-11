@@ -35,6 +35,10 @@ OUT = DATA / "m2"
 
 
 KAGGLE_DATASETS = ("detector_i2n", "detector_i2n_cghd", "crossing")
+# Second, small upload: orientation classifiers + the ground-truth-box
+# net-extraction check (CPU), so neither runs on the local machine.
+SMALL_DATASETS = ("orientation",)
+SMALL_SCRIPTS = ("scripts/eval_netting_oracle.py",)
 
 
 def code_version() -> str:
@@ -48,18 +52,48 @@ def code_version() -> str:
     return commit + ("-dirty" if dirty else "")
 
 
-def build_kaggle_zip(archive: Path) -> str:
+def build_kaggle_zip(
+    archive: Path, datasets=KAGGLE_DATASETS, scripts=(), netting_eval=False
+) -> str:
     version = code_version()
     with zipfile.ZipFile(archive, "w", zipfile.ZIP_STORED) as zf:
-        for name in KAGGLE_DATASETS:
+        for name in datasets:
             for path in sorted((OUT / name).rglob("*")):
                 if path.is_file():
                     zf.write(path, Path("datasets") / path.relative_to(OUT))
-        for path in sorted((ROOT / "src" / "vca").rglob("*.py")):
-            zf.write(path, Path("code") / path.relative_to(ROOT))
+        if netting_eval:
+            _add_netting_eval(zf)
+        for path in sorted((ROOT / "src" / "vca").rglob("*")):
+            if path.suffix in (".py", ".json"):  # taxonomy.json is data
+                zf.write(path, Path("code") / path.relative_to(ROOT))
+        for script in scripts:
+            zf.write(ROOT / script, Path("code") / script)
         zf.write(ROOT / "pyproject.toml", "code/pyproject.toml")
         zf.writestr("code/CODE_COMMIT", version + "\n")
+        if version.endswith("-dirty"):
+            from vca.training import uncommitted_diff
+
+            zf.writestr("code/UNCOMMITTED.diff", uncommitted_diff())
     return version
+
+
+def _add_netting_eval(zf: zipfile.ZipFile) -> None:
+    """Detection images that copy evaluation circuits, with their goldens."""
+    manifest = OUT / "detector_i2n" / "manifest.json"
+    overlaps = json.loads(manifest.read_text(encoding="utf-8"))[
+        "excluded_validation_overlaps"
+    ]
+    zf.write(manifest, "netting_eval/manifest.json")
+    for item in overlaps:
+        image = I2N / "train" / "device_identification" / item["image"]
+        golden = I2N / "golden" / (Path(item["validation_image"]).stem + ".json")
+        zf.write(image, f"netting_eval/device_identification/{image.name}")
+        zf.write(
+            image.with_suffix(".json"),
+            f"netting_eval/device_identification/{image.stem}.json",
+        )
+        if golden.exists():
+            zf.write(golden, f"netting_eval/golden/{golden.name}")
 
 
 def main() -> int:
@@ -68,7 +102,14 @@ def main() -> int:
     parser.add_argument("--val-fraction", type=float, default=0.15)
     parser.add_argument("--no-zip", action="store_true")
     parser.add_argument("--zip-only", action="store_true")
+    parser.add_argument(
+        "--small-zip-only",
+        action="store_true",
+        help="only data/m2_kaggle_small.zip (orientation + net-extraction check)",
+    )
     args = parser.parse_args()
+    if args.small_zip_only:
+        return package_small()
     if args.zip_only:
         return package()
     common = {"val_fraction": args.val_fraction, "seed": args.seed}
@@ -107,7 +148,7 @@ def main() -> int:
             brief = {t: v["counts"] for t, v in manifest["tasks"].items()}
         print(name, json.dumps(brief))
 
-    return 0 if args.no_zip else package()
+    return 0 if args.no_zip else (package() or package_small())
 
 
 def package() -> int:
@@ -117,6 +158,16 @@ def package() -> int:
     print(f"  {archive.stat().st_size / 1e6:,.0f} MB, code {version}")
     if version.endswith("-dirty"):
         print("  note: src/ has uncommitted changes; commit and rerun --zip-only")
+    return 0
+
+
+def package_small() -> int:
+    archive = DATA / "m2_kaggle_small.zip"
+    print(f"zipping -> {archive.relative_to(ROOT)}", flush=True)
+    version = build_kaggle_zip(
+        archive, SMALL_DATASETS, SMALL_SCRIPTS, netting_eval=True
+    )
+    print(f"  {archive.stat().st_size / 1e6:,.0f} MB, code {version}")
     return 0
 
 
