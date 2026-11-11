@@ -94,7 +94,7 @@ class TerminalLayout:
     anchors: dict[str, Point]  # terminal -> normalised (x, y) in the box
     orientation: str
     mirrored: bool
-    orientation_source: str  # "predicted", "box_shape" or "default"
+    orientation_source: str  # "predicted", "contacts", "box_shape" or "default"
     mirror_source: str  # "predicted", "convention" or "n/a"
 
 

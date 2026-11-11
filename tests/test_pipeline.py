@@ -44,7 +44,7 @@ def test_pipeline_threads_every_stage():
     assert calls == []  # resistors have no orientation classifier
     rows = result.component_features
     assert [r["detector_score"] for r in rows] == [0.9] * 4
-    assert rows[3]["orientation_source"] == "box_shape"
+    assert rows[3]["orientation_source"] == "contacts"
     assert result.rules.circuit["no_ground"] == 0
     assert result.rules.circuit["no_supply"] == 1
 

@@ -172,3 +172,30 @@ def test_mapping_cost_prices_the_exact_search_path():
         assert mapping_cost(g1, g2, mapping) == cost
         _, upper = heuristic_mapping(g1, g2)
         assert upper >= cost  # a real edit path: never below the optimum
+
+
+def test_lower_bound_and_descent_bracket_the_exact_ged():
+    import random
+
+    import networkx as nx
+
+    from vca.metrics.assignment_ged import descend, heuristic_mapping, lower_bound
+    from vca.metrics.canonical import build_graph
+
+    rng = random.Random(1)
+    for _ in range(15):
+        g1 = build_graph(_random_netlist(rng, 3, 3))
+        g2 = build_graph(_random_netlist(rng, 4, 3))
+        *_, (path, _edges, exact) = nx.optimize_edit_paths(
+            g1,
+            g2,
+            node_subst_cost=lambda a, b: float(
+                a["node_type"] != b["node_type"] or a["category"] != b["category"]
+            ),
+            edge_subst_cost=lambda a, b: float(a["terminal"] != b["terminal"]),
+        )
+        assert lower_bound(g1, g2) <= exact
+        start, _ = heuristic_mapping(g1, g2)
+        assert descend(g1, g2, start)[1] >= exact
+        optimum = {u: v for u, v in path if u is not None}
+        assert descend(g1, g2, optimum)[1] == exact  # cannot improve on it

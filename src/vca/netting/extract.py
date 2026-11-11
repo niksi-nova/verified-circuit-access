@@ -8,7 +8,8 @@ nets. Then:
    ``cross-line-curved`` class) are cut and their arms re-joined straight
    through (left-right, top-bottom). Plain four-way crossings without a dot
    are found from the image and treated the same way (textbook convention:
-   no dot, no connection) unless a dot / T-junction detection covers them.
+   no dot, no connection) unless a dot-junction detection covers them,
+   including crossings on a lead at the edge of a symbol box.
 2. Rails. Every net touching a ``gnd`` symbol becomes one ``GND`` net, every
    net touching ``vdd`` one ``VDD`` net.
 3. Terminals. Wire ends in a thin ring around a component box are matched
@@ -23,7 +24,7 @@ returned in :class:`NetExtraction` for the verifier.
 from __future__ import annotations
 
 from collections import Counter
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 import numpy as np
 from PIL import Image
@@ -230,6 +231,32 @@ def find_through_lines(
     return found
 
 
+def _assignment_cost(layout: TerminalLayout, contacts, box, w, h) -> float:
+    cost = np.array(
+        [
+            [
+                np.hypot((cx - box[0]) / w - ax, (cy - box[1]) / h - ay)
+                for ax, ay in layout.anchors.values()
+            ]
+            for cx, cy, *_ in contacts
+        ]
+    )
+    rows, cols = linear_sum_assignment(cost)
+    return float(cost[rows, cols].sum())
+
+
+def _axis_from_contacts(d, category, layout, contacts, w, h) -> TerminalLayout:
+    """Of the horizontal and vertical layouts, the one the wires fit best."""
+    vertical = "u" if category == "voltage" else "d"
+    other = vertical if layout.orientation == "l" else "l"
+    alternative = terminal_layout(d.detector_class, category, d.box, other)
+    best = min(
+        (layout, alternative),
+        key=lambda c: _assignment_cost(c, contacts, d.box, w, h),
+    )
+    return replace(best, orientation_source="contacts")
+
+
 def _side_labels(labels: np.ndarray, box: Box, reach: int) -> dict[str, set[int]]:
     """Wire labels just outside each side of a cut box."""
     h, w = labels.shape
@@ -260,7 +287,10 @@ def extract_netlist(
     hops = [c.box for c in crossings if c.kind == "hop"] + [
         d.box for d in detections if d.detector_class in _HOP_CLASSES
     ]
-    joins = [c.box for c in crossings if c.kind != "hop"]
+    # A plain four-way crossing is not one of the crossing model's classes,
+    # so it is usually called a T; only a drawn dot overrules the arm test.
+    # (On the 122 eval circuits, trusting those Ts costs 0.066 NED.)
+    joins = [c.box for c in crossings if c.kind == "dot_junction"]
     symbols = [d for d in detections if d.detector_class not in _HOP_CLASSES]
 
     wires = ink.copy()
@@ -268,7 +298,19 @@ def extract_netlist(
         x1, y1, x2, y2 = _clip(d.box, pad, ink.shape)
         wires[y1:y2, x1:x2] = False
     if detect_plain_crossings:
-        hops += find_plain_crossings(wires, lw, keep=joins + [d.box for d in symbols])
+        # A wire can cross a terminal lead right at a symbol's box edge, so
+        # look for crossings with only the symbol interiors blanked.
+        inset = 2 * lw
+        cores = [
+            (x1 + inset, y1 + inset, x2 - inset, y2 - inset)
+            for x1, y1, x2, y2 in (d.box for d in symbols)
+            if x2 - x1 > 2 * inset and y2 - y1 > 2 * inset
+        ]
+        open_ink = ink.copy()
+        for box in cores:
+            x1, y1, x2, y2 = _clip(box, 0, ink.shape)
+            open_ink[y1:y2, x1:x2] = False
+        hops += find_plain_crossings(open_ink, lw, keep=joins + cores)
     for box in hops:
         x1, y1, x2, y2 = _clip(box, 0, ink.shape)
         wires[y1:y2, x1:x2] = False
@@ -375,13 +417,17 @@ def extract_netlist(
             d.detector_class, category, d.box, d.orientation, d.mirrored
         )
         component_id = f"C{index + 1}"
-        report = ComponentReport(component_id, d.detector_class, layout)
         contacts = [
             c for c in contacts if anchor_hits[c[2]] >= 2 or root_size[c[2]] >= min_wire
         ]
-        names = list(layout.anchors)
         x1, y1, x2, y2 = d.box
         w, h = max(x2 - x1, 1.0), max(y2 - y1, 1.0)
+        if layout.orientation_source == "box_shape" and contacts:
+            # Box shape misleads (a capacitor's plates make a horizontally
+            # wired symbol tall): take the axis the wires actually reach.
+            layout = _axis_from_contacts(d, category, layout, contacts, w, h)
+        report = ComponentReport(component_id, d.detector_class, layout)
+        names = list(layout.anchors)
         if contacts:
 
             def anchor_cost(cx: float, cy: float) -> list[float]:

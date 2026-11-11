@@ -41,6 +41,7 @@ from vca.metrics.alignment import (  # noqa: E402
     connection_scores,
     diagnose,
     ned_from_alignment,
+    ned_lower_bound_from_alignment,
 )
 from vca.netting.orient import YoloClassifiers  # noqa: E402
 from vca.pipeline import Pipeline, YoloCrossings, YoloDetector  # noqa: E402
@@ -61,6 +62,7 @@ def score(job: tuple[str, str, str, float]) -> dict:
     return {
         "circuit_id": circuit_id,
         "ned": ned_from_alignment(alignment, truth),
+        "ned_lower_bound": ned_lower_bound_from_alignment(alignment, truth),
         "ned_exact": alignment.exact,
         "graph_isomorphism": alignment.isomorphic,
         "connection_precision": precision,
@@ -154,6 +156,7 @@ def main(argv: list[str] | None = None) -> int:
     metrics = {
         "circuits": len(rows),
         "macro_ned": mean([r["ned"] for r in rows]),
+        "macro_ned_lower_bound": mean([r["ned_lower_bound"] for r in rows]),
         "ned_exact_fraction": mean([float(r["ned_exact"]) for r in rows]),
         "graph_isomorphism_accuracy": mean(
             [float(r["graph_isomorphism"]) for r in rows]

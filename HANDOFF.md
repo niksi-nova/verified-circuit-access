@@ -1,7 +1,9 @@
 # HANDOFF — verified-circuit-access, M2
 
-Status as of 2026-11-11, branch `feat/m2-training`, last pushed commit
-`bd3275c`. Read `CLAUDE.md` first (commit identity and attribution rules).
+Status as of 2026-11-11: plan steps 1–7 done (pipeline NED 0.131, verifier
+trained); next is improving the verifier and a detector retrain (needs the
+user's OK). Branch `feat/m2-training`. Read `CLAUDE.md` first (commit
+identity and attribution rules).
 
 ## Working rules (agreed with the user)
 
@@ -31,9 +33,9 @@ Status as of 2026-11-11, branch `feat/m2-training`, last pushed commit
 | End-to-end pipeline | `src/vca/pipeline.py`, `scripts/eval_pipeline.py` | done |
 | Netting oracle eval (hand-drawn boxes, 37 circuits) | `scripts/eval_netting_oracle.py` | done |
 | Tighter GED bound | `src/vca/metrics/assignment_ged.py` | done |
-| Verifier (GBM + isotonic calibration) | — | **not started** |
+| Verifier (GBM + isotonic calibration) | `src/vca/verify/model.py`, `scripts/train_verifier.py` | done; AUROC 0.66 |
 
-Tests: 173 pass (`uv run pytest -q`), ruff clean. Makefile targets:
+Tests: 180 pass (`uv run pytest -q`), ruff clean. Makefile targets:
 `prepare-m2`, `train-orientation`, `eval-netting-oracle`, `eval-pipeline`
 (`make` is not installed on this Windows machine; run the commands directly).
 
@@ -60,7 +62,22 @@ Netlist quality (NED: lower is better; isomorphic = exactly right):
 | Oracle + through-line fix | old | 0.489 | 21.6 % | 0.42 / 0.46 |
 | Oracle + through-line fix | **new bound** | **0.173** | 21.6 % | 0.66 / 0.73 |
 | Full pipeline, 122 circuits | old | 0.607 | 15.6 % | 0.31 / 0.32 |
-| Full pipeline, 122 circuits | **new bound** | **0.234** (median 0.202) | 15.6 % | 0.64 / 0.66 |
+| Full pipeline, 122 circuits | **new bound** | 0.234 (median 0.202) | 15.6 % | 0.64 / 0.66 |
+| + descent in scorer, lower bound 0.118 | final | 0.230 | 15.6 % | 0.64 / 0.66 |
+| + capacitor axis from wires (step 2) | final | 0.197 | 24.6 % | 0.72 / 0.72 |
+| + crossing fix (step 3), run `20261111T171400Z` | final | **0.131** (median 0.097, lower bound 0.070) | **32.0 %** | 0.74 / 0.77 |
+| Oracle, 37 circuits, after step 3 | final | 0.146 | 27.0 % | 0.71 / 0.77 |
+
+"final" = descent + BRANCH lower bound (step 1). Step 2–3 rows before the
+recorded run come from re-extracting cached model outputs
+(session scratchpad), same scorer.
+
+Verifier (`results/m2/verifier/20261111T171904Z`, 5-fold by circuit, 1,572
+components, 27.1 % wrong): AUROC 0.66, ECE 0.021, Brier 0.184; flag at
+p ≥ 0.5: precision 0.55, recall 0.16. Rule flags alone: any flag P 0.30 /
+R 0.95; strong flags (shorts, unconnected) P 1.00 / R 0.075. On the old
+pipeline output (48 % wrong) the same code gave AUROC 0.72: the errors left
+are the ones the evidence doesn't explain.
 
 "New bound" = the same predictions rescored with `assignment_ged.py`. The
 recorded pipeline run (`results/m2/pipeline/20261111T150719Z`) was scored
@@ -89,15 +106,27 @@ uv run python scripts/eval_pipeline.py --detector results/m2/detector_i2n_cghd/2
   by <0.01 NED. Default stays "cut".
 - **GED timeouts:** `optimize_edit_paths` stalls far above the optimum on
   circuits with 20+ components, and more time doesn't help (029: 1.15 at
-  10/60/180 s). The assignment bound gives 0.074 there. All 40 pipeline
-  circuits with NED > 0.3 are still non-exact upper bounds.
-- **Net extraction is the main bottleneck, detection the smaller one:** on
-  the 37 oracle circuits the new bound gives 0.173 with hand-drawn boxes
-  vs. 0.220 with detected boxes. The old bound hid this (0.489 vs 0.492).
+  10/60/180 s). The assignment bound gives 0.074 there.
+- **Plain crossings vs. the crossing model:** the crossing model has no
+  "plain 4-way crossing" class and calls most of them `t_junction`. Letting
+  those Ts block the 4-arm test cost 0.066 NED; now only `dot_junction`
+  does. Plain crossings are also looked for at symbol box edges (a gate
+  bus crossing a drain lead right at the box, circuit 019). Drawings that
+  use dots gain most (60 circuits: 27 better, 2 worse); 076 and 079 (no
+  dots) treat plain crossings as joins and got worse.
+- **Detection gap closed:** on the 37 oracle circuits the pipeline (0.129)
+  now beats hand-drawn boxes (0.146; the oracle images are near-duplicate
+  training copies). Detection still loses 120 (three amplifier triangles
+  never detected) and 108 (a weak `vdd` detection merges a net into VDD).
+- **Rails are a minor share:** of ~1,330 net splits/merges, 133 splits and
+  103 merges involve rail nets. Score thresholds on `vdd`/`gnd`/`port`
+  change NED by < 0.002.
+- **Tried and dropped:** tying an otherwise unconnected MOS Body to Source
+  (57 of 70 golden bulks are) gained 0.0015 NED but broke 4 circuits.
 - `extra_contacts` are mostly designator text touching the box ring and
   are usually left unassigned. They are noisy as a feature.
 
-## Remaining error profile (pipeline, new bound, 122 circuits)
+## Error profile before steps 2–3 (pipeline, new bound, 122 circuits)
 
 - 753 of 1,572 predicted components are in at least one error (47.9 %).
 - Error kinds: wrong_connection 726, wrong_component_type 19,
@@ -113,7 +142,11 @@ uv run python scripts/eval_pipeline.py --detector results/m2/detector_i2n_cghd/2
 Note: error labels come from a non-exact alignment on large circuits, so
 some are mis-attributed. Step 1 below exists to fix that.
 
-## Plan to reduce NED and errors
+## Plan to reduce NED and errors (done 2026-11-11; outcomes in Results)
+
+Next: verifier features from neighbouring components/nets; a detector
+retrain for amplifier triangles, `vdd` and `port` (ask first); signal-net
+splits (623) and merges (469) are the remaining bulk of the errors.
 
 1. **Trust the measurement.** Record the clean run (above). Strengthen the
    scorer by adding net split/merge and 3-way swap moves to the descent,

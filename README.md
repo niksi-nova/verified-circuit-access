@@ -256,6 +256,10 @@ Image2Net's golden netlists treat a plain four-way wire crossing without a dot a
 
 `vca.pipeline.Pipeline`: detector -> crossing model -> orientation classifiers -> net extraction (`vca.netting.extract`) -> rule checks (`vca.verify.rules`). It returns the netlist plus one evidence row per component (detector score, orientation source and confidence, unmatched terminals, extra wire contacts, rule flags) for the verifier. `scripts/eval_pipeline.py` runs it on the validation circuits and saves, per circuit, the prediction, the evidence, the GED alignment to the golden netlist and the component errors it implies.
 
+Latest run (122 Image2Net validation circuits, `results/m2/pipeline/20261111T171400Z`): macro NED 0.131 (lower bound 0.070), graph isomorphism 32.0 %, connection precision/recall 0.74/0.77.
+
+`scripts/train_verifier.py` trains the component verifier (`vca.verify.model`: gradient boosting plus isotonic calibration, folds split by circuit) on such a run. On the run above (1,572 components, 27.1 % wrong), cross-validated by circuit: AUROC 0.66, ECE 0.021, Brier 0.184 (`results/m2/verifier/20261111T171904Z`). The strong rule flags (shorts, unconnected terminals) are always right but catch 7.5 % of the wrong components.
+
 ## 8. Data schemas
 
 The project uses structured schemas to maintain consistency between extracted circuit information and evaluation.
@@ -398,11 +402,11 @@ No model-performance metrics should be interpreted as established until an actua
 
 | Verification | Status |
 |---|---|
-| Full automated test suite | 170 passed |
+| Full automated test suite | 180 passed |
 | Ruff checks | Passed |
 | Dataset validation pairs | 122 downloaded/verified locally |
 | Dataset taxonomy audit | 1,573 components; zero unknown labels |
-| Model training | Running on Kaggle; results pending |
+| Model training | M2 detector, crossing and orientation models trained (Kaggle) |
 | Real VLM evaluation | Pending |
 | Circuit simulation evaluation | Not run |
 | End-to-end accessibility evaluation | Not run |
@@ -576,8 +580,8 @@ The current implementation establishes the data, schema, graph, metric, and base
 
 The following work remains:
 
-- Finish the M2 training runs and report detector, crossing, orientation and end-to-end netlist metrics.
-- Train and calibrate the component verifier on the pipeline's per-component evidence and errors.
+- Improve the component verifier's ranking (AUROC 0.66), e.g. with features from neighbouring components and nets.
+- Retrain the detector for the classes it misses (amplifier triangles, `vdd`, `port`).
 - Calibrate verification confidence and establish teacher-review thresholds.
 - Integrate ngspice for numerical circuit verification.
 - Ground generated explanations in verified graph structures and simulation outputs.

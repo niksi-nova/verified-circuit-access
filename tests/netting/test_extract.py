@@ -147,6 +147,26 @@ def test_crossing_model_overrides_the_image_heuristic():
     assert len(hopped.netlist.nets) == 2
 
 
+def test_t_junction_call_does_not_join_a_four_way_crossing():
+    # The crossing model has no "plain crossing" class and calls them T.
+    image, dets = crossing_drawing(dot=False)
+    result = extract_netlist(
+        image, dets, [Crossing("t_junction", (195, 195, 225, 225))]
+    )
+    assert len(result.netlist.nets) == 2
+
+
+def test_crossing_on_a_box_edge_is_cut():
+    # R3's box reaches down to the crossing: its lead crosses the R1-R2
+    # wire right at the box edge, with no dot.
+    image, dets = crossing_drawing(dot=False)
+    dets[2] = Detection("resistor", (190, 20, 230, 207), orientation="d")
+    result = extract_netlist(image, dets)
+    # (R3's far terminal has no wire of its own here, so it is not checked.)
+    assert frozenset({("C3", "Pos"), ("C4", "Neg")}) in nets_of(result)
+    assert result.crossings_cut == 1
+
+
 def test_mos_terminals_follow_the_wires():
     image, draw = canvas((300, 300))
     draw.rectangle((120, 110, 170, 190), outline="black", width=W)
@@ -190,3 +210,21 @@ def test_bus_drawn_through_a_transistor_stays_one_net():
     mos = Detection("nmos", box, orientation="r")
     result = extract_netlist(image, [left, mos, right], detect_plain_crossings=False)
     assert frozenset({("C1", "Neg"), ("C2", "Gate"), ("C3", "Pos")}) in nets_of(result)
+
+
+def test_tall_capacitor_wired_left_right_takes_the_wire_axis():
+    image, draw = canvas()
+    # Two vertical plates: the box is taller than wide, the wires horizontal.
+    wire(draw, (190, 110), (190, 190))
+    wire(draw, (210, 110), (210, 190))
+    left = resistor(draw, (40, 135, 80, 165))
+    right = resistor(draw, (320, 135, 360, 165))
+    wire(draw, (80, 150), (190, 150))
+    wire(draw, (210, 150), (320, 150))
+    cap = Detection("capacitor", (185, 105, 215, 195))
+    result = extract_netlist(image, [left, cap, right], detect_plain_crossings=False)
+    report = result.components[1]
+    assert report.layout.orientation == "l"
+    assert report.layout.orientation_source == "contacts"
+    assert not report.unconnected_terminals
+    assert len(result.netlist.nets) == 2

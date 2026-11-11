@@ -19,7 +19,7 @@ from typing import Literal
 import networkx as nx
 from networkx.algorithms import isomorphism
 
-from vca.metrics.assignment_ged import heuristic_mapping
+from vca.metrics.assignment_ged import descend, heuristic_mapping, lower_bound
 from vca.metrics.canonical import (
     SYMMETRIC_CATEGORIES,
     build_graph,
@@ -57,6 +57,8 @@ class Alignment:
     isomorphic: bool
     component_map: dict[str, str] = field(default_factory=dict)
     net_map: dict[str, str] = field(default_factory=dict)
+    # GED lower bound when the search did not finish (else GED itself).
+    lower_bound: float | None = None
 
 
 def _node_subst_cost(first: dict, second: dict) -> float:
@@ -122,6 +124,7 @@ def align(
             isomorphic=True,
             component_map=component_map,
             net_map=net_map,
+            lower_bound=0.0,
         )
 
     best_pairs: list[tuple[str | None, str | None]] | None = None
@@ -144,16 +147,28 @@ def align(
 
     exact = time.monotonic() - started < timeout
 
+    bound = None
     if not exact:
         # The search stopped early; its best path can be far from optimal.
-        # An assignment-based mapping is often much closer: keep the lower.
-        mapping, cost = heuristic_mapping(pred_graph, gt_graph)
-        if best_cost is None or cost < best_cost:
-            used = {v for v in mapping.values() if v is not None}
-            best_pairs = list(mapping.items()) + [
-                (None, v) for v in gt_graph if v not in used
-            ]
-            best_cost = cost
+        # Local search from it and from an assignment-based mapping is often
+        # much closer: keep the cheapest real edit path.
+        starts = [heuristic_mapping(pred_graph, gt_graph)]
+        if best_pairs is not None:
+            starts.append(
+                descend(
+                    pred_graph,
+                    gt_graph,
+                    {u: v for u, v in best_pairs if u is not None},
+                )
+            )
+        for mapping, cost in starts:
+            if best_cost is None or cost < best_cost:
+                used = {v for v in mapping.values() if v is not None}
+                best_pairs = list(mapping.items()) + [
+                    (None, v) for v in gt_graph if v not in used
+                ]
+                best_cost = cost
+        bound = lower_bound(pred_graph, gt_graph)
 
     if best_pairs is None:
         return Alignment(ged=None, exact=False, isomorphic=False)
@@ -165,6 +180,7 @@ def align(
         isomorphic=False,
         component_map=component_map,
         net_map=net_map,
+        lower_bound=float(best_cost) if exact else bound,
     )
 
 
@@ -177,6 +193,17 @@ def ned_from_alignment(
     if alignment.ged is None or denominator == 0:
         return None
     return alignment.ged / denominator
+
+
+def ned_lower_bound_from_alignment(
+    alignment: Alignment,
+    ground_truth: Netlist,
+) -> float | None:
+    """NED the circuit is guaranteed to reach or exceed (GED lower bound)."""
+    denominator = ned_denominator(ground_truth)
+    if alignment.lower_bound is None or denominator == 0:
+        return None
+    return alignment.lower_bound / denominator
 
 
 def _terminal_nets(netlist: Netlist) -> dict[str, dict[str, str | None]]:

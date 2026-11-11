@@ -27,7 +27,12 @@ from PIL import Image
 
 from vca.data.image2net import load_validation_netlist
 from vca.detect.classes import from_image2net
-from vca.metrics.alignment import align, connection_scores, ned_from_alignment
+from vca.metrics.alignment import (
+    align,
+    connection_scores,
+    ned_from_alignment,
+    ned_lower_bound_from_alignment,
+)
 from vca.netting.extract import Detection, extract_netlist
 from vca.netting.orient import YoloClassifiers, orient
 from vca.training import code_commit, uncommitted_diff
@@ -75,6 +80,7 @@ def score(job, timeout: float) -> dict:
         "components_true": len(truth.components),
         "components_pred": len(predicted.components),
         "ned": ned_from_alignment(alignment, truth),
+        "ned_lower_bound": ned_lower_bound_from_alignment(alignment, truth),
         "ned_exact": alignment.exact,
         "graph_isomorphism": alignment.isomorphic,
         "connection_precision": precision,
@@ -154,6 +160,7 @@ def main(argv: list[str] | None = None) -> int:
         return {
             "circuits": len(subset),
             "macro_ned": mean([r["ned"] for r in subset]),
+            "macro_ned_lower_bound": mean([r["ned_lower_bound"] for r in subset]),
             "ned_exact_fraction": mean([float(r["ned_exact"]) for r in subset]),
             "graph_isomorphism_accuracy": mean(
                 [float(r["graph_isomorphism"]) for r in subset]

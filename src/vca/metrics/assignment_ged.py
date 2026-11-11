@@ -9,7 +9,11 @@ directly, then prices it exactly:
 1. Components are paired by category and wiring signature (Hungarian).
 2. Nets and components are re-paired in turn, each given the other
    (block-coordinate descent on the shared-endpoint count).
-3. Pairwise swaps that lower the exact edit cost are applied until none do.
+3. Swaps, moves to a free node and unmappings that lower the exact edit
+   cost are applied until none do (``descend``).
+
+``lower_bound`` gives the BRANCH lower bound, so each circuit can report
+how far its upper bound might still be from the optimum.
 
 ``mapping_cost`` is the cost of the edit path a mapping implies (unit
 costs, the same as the exact search), so the result is a valid GED upper
@@ -145,35 +149,69 @@ def heuristic_mapping(g1: nx.MultiGraph, g2: nx.MultiGraph) -> tuple[Mapping, fl
             break
         comp_map = new_map
 
-    mapping: Mapping = comp_map | net_map
+    return descend(g1, g2, comp_map | net_map)
+
+
+def descend(
+    g1: nx.MultiGraph, g2: nx.MultiGraph, mapping: Mapping, rounds: int = 20
+) -> tuple[Mapping, float]:
+    """Local search from ``mapping``: swap two nodes' targets, move a node to
+    a free target, or unmap it, while the exact cost drops."""
+    mapping = {u: mapping.get(u) for u in g1}
     best = mapping_cost(g1, g2, mapping)
-    return _swap_descent(g1, g2, mapping, best)
-
-
-def _swap_descent(g1, g2, mapping: Mapping, best: float, rounds: int = 3):
-    """Swap the targets of two same-kind nodes (or retarget to a free node)."""
     for _ in range(rounds):
         improved = False
         for kind in ("net", "component"):
             ours = _nodes(g1, kind)
-            free = [n for n in _nodes(g2, kind) if n not in set(mapping.values())]
+            theirs = _nodes(g2, kind)
             for i, a in enumerate(ours):
-                options = [(b, None) for b in ours[i + 1 :]] + [(None, f) for f in free]
-                for b, f in options:
+                taken = set(mapping.values())
+                trials = [(b, "swap") for b in ours[i + 1 :]]
+                trials += [(f, "move") for f in theirs if f not in taken]
+                trials += [(None, "unmap")] if mapping[a] is not None else []
+                for target, how in trials:
                     trial = dict(mapping)
-                    if b is not None:
-                        trial[a], trial[b] = mapping[b], mapping[a]
+                    if how == "swap":
+                        trial[a], trial[target] = mapping[target], mapping[a]
                     else:
-                        trial[a] = f
+                        trial[a] = target
                     cost = mapping_cost(g1, g2, trial)
                     if cost < best:
                         mapping, best, improved = trial, cost, True
-                        free = [
-                            n
-                            for n in _nodes(g2, kind)
-                            if n not in set(mapping.values())
-                        ]
                         break
         if not improved:
             break
     return mapping, best
+
+
+def lower_bound(g1: nx.MultiGraph, g2: nx.MultiGraph) -> float:
+    """BRANCH lower bound on unit-cost GED (Blumenthal & Gamper).
+
+    Each node is priced with its own substitution cost plus half the
+    mismatch between its incident edge labels; every edge is shared by two
+    nodes, so the optimal assignment of these prices never exceeds GED.
+    """
+    n1, n2 = list(g1), list(g2)
+
+    def labels(graph, node):
+        return Counter(d["terminal"] for *_, d in graph.edges(node, data=True))
+
+    lab1 = [labels(g1, u) for u in n1]
+    lab2 = [labels(g2, v) for v in n2]
+    size = len(n1) + len(n2)
+    cost = np.full((size, size), _FAR)
+    for i, u in enumerate(n1):
+        a, deg_a = g1.nodes[u], sum(lab1[i].values())
+        for j, v in enumerate(n2):
+            b, deg_b = g2.nodes[v], sum(lab2[j].values())
+            node = float(
+                a["node_type"] != b["node_type"] or a["category"] != b["category"]
+            )
+            common = sum((lab1[i] & lab2[j]).values())
+            cost[i, j] = node + 0.5 * (max(deg_a, deg_b) - common)
+        cost[i, len(n2) + i] = 1 + 0.5 * deg_a  # delete u
+    for j in range(len(n2)):
+        cost[len(n1) + j, j] = 1 + 0.5 * sum(lab2[j].values())  # insert v
+    cost[len(n1) :, len(n2) :] = 0
+    rows, cols = linear_sum_assignment(cost)
+    return float(cost[rows, cols].sum())
