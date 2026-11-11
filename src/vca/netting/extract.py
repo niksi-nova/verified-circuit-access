@@ -76,6 +76,7 @@ class NetExtraction:
     line_width: float
     crossings_cut: int
     single_terminal_nets: list[str]
+    rail_conflicts: int = 0  # nets touching both a GND and a VDD symbol
 
 
 def binarize(image: Image.Image) -> np.ndarray:
@@ -265,9 +266,13 @@ def extract_netlist(
 
     # Rails merge every net that touches them.
     rail_root: dict[int, str] = {}
+    rails_touched: dict[int, set[str]] = {}
     for d in rails:
         for _, _, root, _ in ring_contacts(d.box):
             rail_root.setdefault(root, RAILS[d.detector_class])
+            rails_touched.setdefault(root, set()).add(RAILS[d.detector_class])
+    # One wire touching both a GND and a VDD symbol: a short or a misread.
+    rail_conflicts = sum(len(r) > 1 for r in rails_touched.values())
 
     # A net matters if it reaches two anchors (terminals / rails / ports);
     # isolated ink near a box (designator text such as "M1") is ignored.
@@ -357,4 +362,5 @@ def extract_netlist(
         single_terminal_nets=sorted(
             k for k, v in endpoints.items() if len(v) == 1 and k not in RAILS.values()
         ),
+        rail_conflicts=rail_conflicts,
     )

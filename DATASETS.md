@@ -34,8 +34,10 @@ confirm the flagged items directly instead of relying on search snippets.
   files. `vca.data.cghd.load_pascal_voc` parses all of them into 248,019
   boxes across 59 classes (40,711 with a rotation); one zero-area `text`
   box in `drafter_0/C1_D37_P1.xml` is skipped, which accounts for the
-  record's stated 248,020. The 59 CGHD classes are not yet mapped to the
-  canonical taxonomy (M2). 12 LTspice `.asc` netlists are included.
+  record's stated 248,020. For M2 the CGHD classes are mapped onto the
+  detector classes in `vca.detect.classes`; symbols with no counterpart
+  (18,076 boxes) are painted out, and CGHD is used for detector training
+  only. 12 LTspice `.asc` netlists are included (not used).
 - **Annotation format:** Bounding boxes (59 object classes), binary
   segmentation maps, polygon annotations (per Zenodo snippet). The GitHub
   mirror's older packaging uses PASCAL VOC XML per-image, plus LTspice
@@ -84,6 +86,11 @@ confirm the flagged items directly instead of relying on search snippets.
   into `data/image2net/train/`): `device_identification/` 2,269 images +
   2,269 Labelme JSON; `device_orientation/` 12,554 crops in 8 class
   folders; `jumper_identification/` 855 images + 855 YOLO-OBB label files.
+- **Leakage exclusions (M2):** 37 `device_identification` images and 18
+  `jumper_identification` images duplicate a validation circuit (exact or
+  perceptual-hash near copy) and are excluded from training and from the
+  detector/crossing validation splits; the lists are in each dataset's
+  `manifest.json` (`excluded_validation_overlaps`).
 - **Risk:** Low. Public repo, explicit Apache-2.0, no access restriction.
   Residual risk is the unnamed "applicable data licenses" caveat on
   original source material — worth re-checking if we ever redistribute

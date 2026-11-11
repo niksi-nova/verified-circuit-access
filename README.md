@@ -48,7 +48,7 @@ The intended architecture separates extraction, graph representation, verificati
 
 ## 4. Repository status
 
-The repository currently contains the foundational implementation for Milestone 1 (M1).
+The repository contains Milestone 1 (M1) and the code for Milestone 2 (M2): training data, model training, net extraction, rule checks and the end-to-end pipeline. M2 models are being trained on Kaggle; no M2 numbers are reported yet.
 
 | Component | Current status |
 |---|---|
@@ -58,19 +58,25 @@ The repository currently contains the foundational implementation for Milestone 
 | Component taxonomy | Implemented |
 | Image2Net dataset integration | Implemented |
 | Dataset taxonomy audit | Implemented |
-| CGHD PASCAL VOC box loader | Implemented (LTspice netlists: M2) |
+| CGHD PASCAL VOC box loader | Implemented (LTspice netlists not used) |
 | Graph isomorphism metric | Implemented |
 | Normalized graph edit distance (NED) | Implemented |
 | VLM baseline (Claude provider + CLI) | Implemented |
 | Evaluation framework | Implemented |
 | Evaluation overlays | Implemented |
 | Results storage | Implemented |
+| M2 training datasets (detector, orientation, crossing) | Implemented |
+| Model training entry point (`vca.training`, Kaggle notebooks) | Implemented; runs pending |
+| Orientation / mirroring classifiers | Implemented; training pending |
+| Net extraction from boxes and wires | Implemented |
+| Electrical rule checks | Implemented |
+| End-to-end pipeline and evaluation script | Implemented; evaluation pending |
 | Trained component verifier | Not implemented |
 | ngspice-based numerical verification | Not implemented |
 | Accessible explanation generation | Future implementation |
 | Screen-reader, Braille, and tactile output | Future implementation |
 
-**Important:** Implemented infrastructure does not imply that a trained model or complete end-to-end system is available. No model has been trained, and no baseline numbers are reported until the evaluation in section 12 has been run.
+**Important:** Implemented infrastructure does not imply that a trained model or complete end-to-end system is available. No trained-model or baseline numbers are reported until the corresponding runs have finished and their provenance is recorded (section 12).
 
 ## 5. Technology stack
 
@@ -101,7 +107,16 @@ verified-circuit-access/
 │
 ├── scripts/
 │   ├── download_image2net_validation.py
-│   └── list_image2net_labels.py
+│   ├── download_training_data.py
+│   ├── list_image2net_labels.py
+│   ├── prepare_m2_data.py
+│   ├── train_orientation.py
+│   ├── eval_netting_oracle.py
+│   └── eval_pipeline.py
+│
+├── notebooks/
+│   ├── m2_kaggle_train.ipynb
+│   └── m2_kaggle_orientation_netting.ipynb
 │
 ├── src/
 │   └── vca/
@@ -118,6 +133,13 @@ verified-circuit-access/
 │       │   ├── ned.py
 │       │   └── graph_iso.py
 │       │
+│       ├── detect/          # detector class map, YOLO dataset builder
+│       ├── classify/        # orientation and crossing datasets
+│       ├── netting/         # terminals, orientation, net extraction
+│       ├── verify/          # electrical rule checks
+│       ├── pipeline.py      # image -> netlist with per-component evidence
+│       ├── training.py      # Ultralytics training with recorded provenance
+│       │
 │       └── baseline/
 │           ├── errors.py
 │           ├── evaluation.py
@@ -130,7 +152,11 @@ verified-circuit-access/
 │   ├── schemas/
 │   ├── data/
 │   ├── metrics/
-│   └── baseline/
+│   ├── baseline/
+│   ├── detect/
+│   ├── classify/
+│   ├── netting/
+│   └── verify/
 │
 ├── .env.example
 ├── .gitignore
@@ -207,7 +233,28 @@ The currently verified local dataset contains 122 pairs.
 
 ### CGHD dataset
 
-`vca.data.cghd.load_pascal_voc` parses CGHD's PASCAL VOC box files into the shared COCO-style records (`ImageRecord`, `AnnotationRecord`), keeping the raw label in `source_label` and reading `<rotation>` when present. CGHD labels not yet in the taxonomy map to `unknown` and are returned in `unmapped_labels` so they can be added deliberately. LTspice `.asc` netlist conversion is part of M2.
+`vca.data.cghd.load_pascal_voc` parses CGHD's PASCAL VOC box files into the shared COCO-style records (`ImageRecord`, `AnnotationRecord`), keeping the raw label in `source_label` and reading `<rotation>` when present. CGHD labels not yet in the taxonomy map to `unknown` and are returned in `unmapped_labels` so they can be added deliberately. CGHD's 12 LTspice `.asc` netlists are not used.
+
+### M2 training data
+
+`make prepare-m2` builds four datasets under `data/m2/` (seed 42, 15 % validation):
+
+| Dataset | Source | Train / val | Notes |
+|---|---|---|---|
+| `detector_i2n` | Image2Net `device_identification` | 1,899 / 333 images | 22 detector classes |
+| `detector_i2n_cghd` | the above + CGHD (train only) | 5,168 / 333 images | 18,076 CGHD boxes with no matching class painted out |
+| `orientation` | Image2Net `device_orientation` | 8 tasks | split by drawing, so a crop's rotations never straddle the split |
+| `crossing` | Image2Net `jumper_identification` | 714 / 123 images | YOLO-OBB: hop, dot junction, T-junction |
+
+Leakage: 37 detection images and 18 crossing images copy (exactly or near) one of the 122 netlist-evaluation circuits and are dropped. Train/val splits are made by near-duplicate group, and the detector's val split is Image2Net only.
+
+Orientation classifiers train with horizontal flipping off (`--fliplr 0`): a flip turns an `l` crop into `r` and changes the mirror state, so Ultralytics' default mislabels half the flipped samples.
+
+Image2Net's golden netlists treat a plain four-way wire crossing without a dot as connected in at least one circuit (1768), while the crossing labels leave plain crossings unlabelled. The extractor can cut plain crossings or keep them joined (`--no-plain-crossings`); which convention matches the golden netlists is being measured.
+
+### M2 pipeline
+
+`vca.pipeline.Pipeline`: detector -> crossing model -> orientation classifiers -> net extraction (`vca.netting.extract`) -> rule checks (`vca.verify.rules`). It returns the netlist plus one evidence row per component (detector score, orientation source and confidence, unmatched terminals, extra wire contacts, rule flags) for the verifier. `scripts/eval_pipeline.py` runs it on the validation circuits and saves, per circuit, the prediction, the evidence, the GED alignment to the golden netlist and the component errors it implies.
 
 ## 8. Data schemas
 
@@ -349,11 +396,11 @@ No model-performance metrics should be interpreted as established until an actua
 
 | Verification | Status |
 |---|---|
-| Full automated test suite | 139 passed |
+| Full automated test suite | 170 passed |
 | Ruff checks | Passed |
 | Dataset validation pairs | 122 downloaded/verified locally |
 | Dataset taxonomy audit | 1,573 components; zero unknown labels |
-| Model training | Not run |
+| Model training | Running on Kaggle; results pending |
 | Real VLM evaluation | Pending |
 | Circuit simulation evaluation | Not run |
 | End-to-end accessibility evaluation | Not run |
@@ -484,15 +531,19 @@ These commands verify the current codebase. The reported historical test count s
 
 ## 15. Makefile commands
 
-The repository currently defines the following Makefile targets:
+The repository defines the following Makefile targets (GPU training normally runs on Kaggle through the notebooks in `notebooks/`):
 
 | Target | Behavior |
 |---|---|
 | `make data` | Downloads the 122 Image2Net validation pairs into `data/image2net/` |
 | `make eval` | Runs the Claude baseline on all circuits; extra flags via `ARGS="--limit 5"` |
 | `make rescore PRED=<dir>` | Re-scores saved predictions without API calls |
+| `make data-train` | Downloads the Image2Net training subsets and CGHD |
+| `make prepare-m2` | Builds `data/m2/` and the two Kaggle upload zips |
+| `make train-orientation` | Trains the eight orientation/mirroring classifiers (local GPU) |
+| `make eval-netting-oracle` | Net extraction on hand-drawn boxes (37 circuits) |
+| `make eval-pipeline ARGS=...` | Full pipeline on the 122 circuits with trained weights |
 | `make test` / `make lint` | pytest / ruff |
-| `make train` | Stops; training is M2 |
 | `make demo` | Stops; the accessible-output demo is M3 |
 
 ## 16. Dataset and model approval requirements
@@ -523,8 +574,8 @@ The current implementation establishes the data, schema, graph, metric, and base
 
 The following work remains:
 
-- Complete the extraction pipeline for circuit diagram images.
-- Develop and train the component and connection verification model.
+- Finish the M2 training runs and report detector, crossing, orientation and end-to-end netlist metrics.
+- Train and calibrate the component verifier on the pipeline's per-component evidence and errors.
 - Calibrate verification confidence and establish teacher-review thresholds.
 - Integrate ngspice for numerical circuit verification.
 - Ground generated explanations in verified graph structures and simulation outputs.

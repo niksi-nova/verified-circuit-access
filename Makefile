@@ -1,4 +1,4 @@
-.PHONY: data data-train eval rescore test lint train demo
+.PHONY: data data-train eval rescore test lint prepare-m2 train-orientation \n	eval-netting-oracle eval-pipeline demo
 
 # Image2Net validation pairs (Apache-2.0), pinned commit, into git-ignored data/.
 data:
@@ -26,9 +26,28 @@ test:
 lint:
 	uv run ruff check .
 
-train:
-	@echo "Training belongs to M2 and is not implemented yet."
-	@exit 1
+# M2 datasets under data/m2/ plus the Kaggle upload zips
+# (data/m2_kaggle.zip: detectors + crossing; data/m2_kaggle_small.zip:
+# orientation + netting check). Run after `make data data-train`.
+prepare-m2:
+	uv run python scripts/prepare_m2_data.py $(ARGS)
+	uv run python scripts/prepare_m2_data.py --small-zip-only
+
+# The detectors and crossing model train on a GPU: upload the zips to Kaggle
+# and run notebooks/m2_kaggle_train.ipynb and
+# notebooks/m2_kaggle_orientation_netting.ipynb. These targets are the same
+# steps for a local GPU. Extra flags: ARGS="--device 0 --epochs 30"
+train-orientation:
+	uv run python scripts/train_orientation.py $(ARGS)
+
+# Net extraction alone, on hand-drawn boxes (37 validation circuits).
+eval-netting-oracle:
+	uv run python scripts/eval_netting_oracle.py $(ARGS)
+
+# Full pipeline on the 122 validation circuits:
+# make eval-pipeline ARGS="--detector <best.pt> --crossings <best.pt> #     --orientation-results results/m2"
+eval-pipeline:
+	uv run python scripts/eval_pipeline.py $(ARGS)
 
 demo:
 	@echo "The accessible-output demo belongs to M3 and is not implemented yet."
