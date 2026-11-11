@@ -7,6 +7,7 @@ from vca.netting.extract import (
     Detection,
     binarize,
     extract_netlist,
+    find_through_lines,
     line_width,
 )
 from vca.netting.terminals import rotate, terminal_layout
@@ -158,3 +159,34 @@ def test_mos_terminals_follow_the_wires():
     assert report.terminal_nets["Gate"] == report.terminal_nets["Drain"]
     assert report.terminal_nets["Source"] != report.terminal_nets["Drain"]
     assert result.single_terminal_nets == [report.terminal_nets["Source"]]
+
+
+def mos_strokes(draw, box):
+    """Gate plate, channel and drain/source stubs of a MOS symbol (gate right)."""
+    x1, y1, x2, y2 = box
+    wire(draw, (x2 - 15, y1 + 15), (x2 - 15, y2 - 15))  # gate plate
+    wire(draw, (x2 - 30, y1 + 10), (x2 - 30, y2 - 10))  # channel
+    wire(draw, (x1, y1 + 10), (x2 - 30, y1 + 10))  # drain stub
+    wire(draw, (x1, y2 - 10), (x2 - 30, y2 - 10))  # source stub
+
+
+def test_symbol_strokes_are_not_a_through_line():
+    image, draw = canvas()
+    box = (150, 100, 230, 180)
+    mos_strokes(draw, box)
+    assert find_through_lines(binarize(image), box, W) == []
+
+
+def test_bus_drawn_through_a_transistor_stays_one_net():
+    image, draw = canvas()
+    box = (150, 100, 230, 180)
+    mos_strokes(draw, box)
+    left = resistor(draw, (20, 125, 50, 155))
+    right = resistor(draw, (350, 125, 380, 155))
+    wire(draw, (50, 140), (350, 140))  # gate bus straight through the symbol
+    ink = binarize(image)
+    assert find_through_lines(ink, box, W) == [("row", 140)]
+
+    mos = Detection("nmos", box, orientation="r")
+    result = extract_netlist(image, [left, mos, right], detect_plain_crossings=False)
+    assert frozenset({("C1", "Neg"), ("C2", "Gate"), ("C3", "Pos")}) in nets_of(result)

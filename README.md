@@ -313,7 +313,9 @@ src/vca/metrics/ned.py
 
 The metric compares canonical component-net incidence graphs using graph edit operations.
 
-Exact GED is NP-hard. The search (`networkx.optimize_edit_paths`) runs until a timeout (30 s by default); if it stops early, the best path found so far is used, so that circuit's NED is an upper bound and is flagged `ned_exact: false` in the results.
+Exact GED is NP-hard. The search (`networkx.optimize_edit_paths`) runs until a timeout (30 s by default). If it stops early, its best path can be far from optimal on circuits with a few dozen components, and more time barely helps. In that case an assignment-based mapping is also priced (`src/vca/metrics/assignment_ged.py`: components matched by category and wiring, nets and components re-matched in turn, then improving swaps), and the cheaper of the two edit paths is used. Either way the NED is the cost of a real edit path, so it is an upper bound, flagged `ned_exact: false`.
+
+The bound matters: on the full pipeline's 122 predictions it lowered macro NED from 0.607 to 0.234 with the predictions unchanged. NED numbers are only comparable when scored with the same alignment code; graph-isomorphism accuracy does not depend on the search.
 
 The same best edit path gives a node alignment between prediction and golden circuit. That alignment drives:
 

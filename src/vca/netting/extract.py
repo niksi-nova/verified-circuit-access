@@ -40,6 +40,7 @@ Box = tuple[float, float, float, float]  # x1, y1, x2, y2 in pixels
 RAILS = {"gnd": "GND", "vdd": "VDD"}
 _HOP_CLASSES = {"cross-line-curved"}
 _EIGHT = np.ones((3, 3), dtype=bool)
+_THROUGH_CLASSES = ("nmos", "pmos")  # gate buses are drawn through MOS symbols
 
 
 @dataclass(frozen=True)
@@ -67,6 +68,8 @@ class ComponentReport:
     terminal_distance: dict[str, float] = field(default_factory=dict)
     unconnected_terminals: list[str] = field(default_factory=list)
     extra_contacts: int = 0
+    # (x, y, net, terminal or None) for every wire end kept at the box.
+    contacts: list[tuple[float, float, str, str | None]] = field(default_factory=list)
 
 
 @dataclass
@@ -189,6 +192,44 @@ def find_plain_crossings(ink: np.ndarray, lw: float, keep: list[Box]) -> list[Bo
     return boxes
 
 
+def find_through_lines(
+    ink: np.ndarray, box: tuple[int, int, int, int], lw: float
+) -> list[tuple[str, int]]:
+    """Thin straight lines crossing a whole (clipped) box: ("row", y) / ("col", x).
+
+    Schematics often run a gate bus straight through a transistor symbol.
+    Blanking the box cuts that bus in two; the line drawn through the
+    symbol shows both halves are one wire. A symbol's own strokes (plates,
+    channel, stubs) never span the box edge to edge in a single thin line.
+    """
+    x1, y1, x2, y2 = box
+    half = max(1, int(lw // 2))
+    away = int(np.ceil(lw)) + 2
+    found: list[tuple[str, int]] = []
+    for axis, view, lo, hi in (
+        ("row", ink[:, x1:x2], y1, y2),
+        ("col", ink[y1:y2, :].T, x1, x2),
+    ):
+        if view.shape[1] < 2:
+            continue
+        hits = []
+        for c in range(lo + half, hi - half):
+            if not view[c - half : c + half + 1].any(axis=0).all():
+                continue
+            near = [view[c + s].mean() for s in (-away, away) if 0 <= c + s < len(view)]
+            if len(near) == 2 and max(near) < 0.5:
+                hits.append(c)
+        # One line covers several adjacent rows: keep each run's middle.
+        runs: list[list[int]] = []
+        for c in hits:
+            if runs and c - runs[-1][-1] <= 1:
+                runs[-1].append(c)
+            else:
+                runs.append([c])
+        found += [(axis, run[len(run) // 2]) for run in runs]
+    return found
+
+
 def _side_labels(labels: np.ndarray, box: Box, reach: int) -> dict[str, set[int]]:
     """Wire labels just outside each side of a cut box."""
     h, w = labels.shape
@@ -234,6 +275,27 @@ def extract_netlist(
 
     labels, n = ndimage.label(wires, structure=_EIGHT)
     uf = _UnionFind(n + 1)
+    # Wires drawn straight through a transistor symbol are one wire.
+    # component index -> (axis, coordinate) of each line drawn through it
+    through: dict[int, list[tuple[str, int]]] = {}
+    for index, d in enumerate(components):
+        if not d.detector_class.startswith(_THROUGH_CLASSES):
+            continue
+        x1, y1, x2, y2 = _clip(d.box, pad, ink.shape)
+        r = max(1, int(lw))
+        for axis, c in find_through_lines(ink, (x1, y1, x2, y2), lw):
+            if axis == "row":
+                a = labels[c - r : c + r + 1, max(0, x1 - reach) : x1]
+                b = labels[c - r : c + r + 1, x2 : x2 + reach]
+            else:
+                a = labels[max(0, y1 - reach) : y1, c - r : c + r + 1]
+                b = labels[y2 : y2 + reach, c - r : c + r + 1]
+            ends = [set(a[a > 0].tolist()), set(b[b > 0].tolist())]
+            for la in ends[0]:
+                for lb in ends[1]:
+                    uf.union(la, lb)
+            if ends[0] and ends[1]:
+                through.setdefault(index, []).append((axis, c))
     for box in hops:
         sides = _side_labels(labels, box, reach)
         for a, b in (("left", "right"), ("top", "bottom")):
@@ -306,13 +368,13 @@ def extract_netlist(
 
     built: list[Component] = []
     for index, (d, contacts) in enumerate(
-        zip(components, contacts_by_component, strict=True), start=1
+        zip(components, contacts_by_component, strict=True)
     ):
         category = NETLIST_CATEGORY[d.detector_class]
         layout = terminal_layout(
             d.detector_class, category, d.box, d.orientation, d.mirrored
         )
-        component_id = f"C{index}"
+        component_id = f"C{index + 1}"
         report = ComponentReport(component_id, d.detector_class, layout)
         contacts = [
             c for c in contacts if anchor_hits[c[2]] >= 2 or root_size[c[2]] >= min_wire
@@ -321,15 +383,25 @@ def extract_netlist(
         x1, y1, x2, y2 = d.box
         w, h = max(x2 - x1, 1.0), max(y2 - y1, 1.0)
         if contacts:
-            cost = np.array(
-                [
-                    [
-                        np.hypot((cx - x1) / w - ax, (cy - y1) / h - ay)
-                        for ax, ay in (layout.anchors[t] for t in names)
-                    ]
-                    for cx, cy, _, _ in contacts
+
+            def anchor_cost(cx: float, cy: float) -> list[float]:
+                return [
+                    float(np.hypot((cx - x1) / w - ax, (cy - y1) / h - ay))
+                    for ax, ay in (layout.anchors[t] for t in names)
                 ]
-            )
+
+            # Both halves of a wire drawn through the symbol touch it: keep
+            # the half that meets a terminal, drop the pass-through half.
+            for axis, line in through.get(index, []):
+                on_line = [
+                    c
+                    for c in contacts
+                    if abs((c[1] if axis == "row" else c[0]) - line) <= 2 * lw
+                ]
+                if len({c[2] for c in on_line}) == 1 and len(on_line) > 1:
+                    keep = min(on_line, key=lambda c: min(anchor_cost(c[0], c[1])))
+                    contacts = [c for c in contacts if c not in on_line or c is keep]
+            cost = np.array([anchor_cost(cx, cy) for cx, cy, _, _ in contacts])
             rows, cols = linear_sum_assignment(cost)
             for r, c in zip(rows, cols, strict=True):
                 terminal = names[c]
@@ -340,6 +412,16 @@ def extract_netlist(
                     NetEndpoint(component_id=component_id, terminal_name=terminal)
                 )
             report.extra_contacts = len(contacts) - len(rows)
+            assigned = dict(zip(rows.tolist(), cols.tolist(), strict=True))
+            report.contacts = [
+                (
+                    round(cx, 1),
+                    round(cy, 1),
+                    name_of(root),
+                    names[assigned[i]] if i in assigned else None,
+                )
+                for i, (cx, cy, root, _) in enumerate(contacts)
+            ]
         report.unconnected_terminals = [
             t for t in names if t not in report.terminal_nets
         ]

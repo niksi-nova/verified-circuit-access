@@ -71,9 +71,7 @@ def test_missed_component():
 
 def test_extra_component():
     truth = build(reference())
-    predicted = build(
-        reference() + [("C9", "capacitor", {"Pos": "A", "Neg": "C"})]
-    )
+    predicted = build(reference() + [("C9", "capacitor", {"Pos": "A", "Neg": "C"})])
 
     assert kinds(predicted, truth) == ["extra_component"]
 
@@ -124,3 +122,53 @@ def test_scores_give_partial_credit():
     # except C loses R1 too.
     assert 0.0 < connection_r < 1.0
     assert 0.0 < connection_p <= 1.0
+
+
+def _random_netlist(rng, n_comp, n_net):
+    from vca.schemas.netlist import Component, Net, NetEndpoint, Netlist, Terminal
+
+    kinds = {"resistor": ("Pos", "Neg"), "nmos": ("Drain", "Gate", "Source")}
+    comps, nets = [], {f"n{i}": [] for i in range(n_net)}
+    for i in range(n_comp):
+        cat = rng.choice(sorted(kinds))
+        comps.append(
+            Component(
+                id=f"C{i}",
+                canonical_category=cat,
+                terminals=[Terminal(name=t) for t in kinds[cat]],
+            )
+        )
+        for t in kinds[cat]:
+            nets[f"n{rng.randrange(n_net)}"].append(
+                NetEndpoint(component_id=f"C{i}", terminal_name=t)
+            )
+    return Netlist(
+        components=comps,
+        nets=[Net(name=k, endpoints=v) for k, v in nets.items() if v],
+    )
+
+
+def test_mapping_cost_prices_the_exact_search_path():
+    import random
+
+    import networkx as nx
+
+    from vca.metrics.assignment_ged import heuristic_mapping, mapping_cost
+    from vca.metrics.canonical import build_graph
+
+    rng = random.Random(0)
+    for _ in range(15):
+        g1 = build_graph(_random_netlist(rng, 3, 3))
+        g2 = build_graph(_random_netlist(rng, 3, 3))
+        *_, (path, _edges, cost) = nx.optimize_edit_paths(
+            g1,
+            g2,
+            node_subst_cost=lambda a, b: float(
+                a["node_type"] != b["node_type"] or a["category"] != b["category"]
+            ),
+            edge_subst_cost=lambda a, b: float(a["terminal"] != b["terminal"]),
+        )
+        mapping = {u: v for u, v in path if u is not None}
+        assert mapping_cost(g1, g2, mapping) == cost
+        _, upper = heuristic_mapping(g1, g2)
+        assert upper >= cost  # a real edit path: never below the optimum

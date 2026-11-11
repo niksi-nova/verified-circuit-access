@@ -4,8 +4,9 @@ The alignment is the node mapping from the graph-edit path that realises the
 (best found) graph edit distance on the canonical graph, so NED, connection
 precision/recall and the per-element error list all come from one
 consistent correspondence. Exact GED is exponential; when the search hits
-``timeout`` the result is the best path found so far (an upper bound) and
-``Alignment.exact`` is False.
+``timeout`` the result is the cheaper of the best path found so far and an
+assignment-based path (``vca.metrics.assignment_ged``): an upper bound, with
+``Alignment.exact`` False.
 """
 
 from __future__ import annotations
@@ -18,6 +19,7 @@ from typing import Literal
 import networkx as nx
 from networkx.algorithms import isomorphism
 
+from vca.metrics.assignment_ged import heuristic_mapping
 from vca.metrics.canonical import (
     SYMMETRIC_CATEGORIES,
     build_graph,
@@ -142,6 +144,17 @@ def align(
 
     exact = time.monotonic() - started < timeout
 
+    if not exact:
+        # The search stopped early; its best path can be far from optimal.
+        # An assignment-based mapping is often much closer: keep the lower.
+        mapping, cost = heuristic_mapping(pred_graph, gt_graph)
+        if best_cost is None or cost < best_cost:
+            used = {v for v in mapping.values() if v is not None}
+            best_pairs = list(mapping.items()) + [
+                (None, v) for v in gt_graph if v not in used
+            ]
+            best_cost = cost
+
     if best_pairs is None:
         return Alignment(ged=None, exact=False, isomorphic=False)
 
@@ -222,9 +235,7 @@ def diagnose(
 
         expected = gt_terminals[gt_component.id]
         observed = {
-            terminal: (
-                alignment.net_map.get(net) if net is not None else None
-            )
+            terminal: (alignment.net_map.get(net) if net is not None else None)
             for terminal, net in pred_terminals[pred_id].items()
         }
 
@@ -343,7 +354,5 @@ def component_scores(
     )
 
     precision = matched / len(predicted.components) if predicted.components else None
-    recall = (
-        matched / len(ground_truth.components) if ground_truth.components else None
-    )
+    recall = matched / len(ground_truth.components) if ground_truth.components else None
     return precision, recall

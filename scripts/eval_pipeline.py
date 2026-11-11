@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import asdict
@@ -89,7 +90,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--no-plain-crossings", action="store_true")
     parser.add_argument("--timeout", type=float, default=30.0, help="GED search, s")
-    parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=max(1, (os.cpu_count() or 2) - 2),
+        help="scoring processes (default: all cores but two)",
+    )
     parser.add_argument("--limit", type=int, default=None, help="first N circuits")
     args = parser.parse_args(argv)
 

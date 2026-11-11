@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from collections import Counter
 from concurrent.futures import ProcessPoolExecutor
@@ -108,7 +109,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output-dir", default="results/m2/netting_oracle", type=Path)
     parser.add_argument("--no-plain-crossings", action="store_true")
     parser.add_argument("--timeout", type=float, default=30.0, help="GED search, s")
-    parser.add_argument("--workers", type=int, default=6)
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=max(1, (os.cpu_count() or 2) - 2),
+        help="scoring processes (default: all cores but two)",
+    )
     parser.add_argument(
         "--orientation-results",
         type=Path,
