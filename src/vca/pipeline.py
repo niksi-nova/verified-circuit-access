@@ -25,6 +25,19 @@ from vca.verify.rules import RuleReport, check
 
 Detector = Callable[[Image.Image], list[Detection]]
 CrossingModel = Callable[[Image.Image], list[Crossing]]
+StageHook = Callable[[str], None]
+
+# The stage boundaries a caller can observe, in call order. Purely
+# informational (e.g. for a progress UI); the pipeline's own control flow
+# never depends on them.
+STAGES: tuple[str, ...] = (
+    "read_image",
+    "detect_components",
+    "detect_crossings",
+    "orientation",
+    "netting",
+    "rule_checks",
+)
 
 
 @dataclass
@@ -45,20 +58,38 @@ class Pipeline:
     classify: Classifier | None = None
     detect_plain_crossings: bool = True
 
-    def __call__(self, image: Image.Image) -> PipelineResult:
+    def __call__(
+        self, image: Image.Image, on_stage: StageHook | None = None
+    ) -> PipelineResult:
+        """``on_stage``, if given, is called with each name in ``STAGES``
+        as that stage starts. Optional and side-effect-free from the
+        pipeline's point of view — it never influences the result."""
+        notify = on_stage or (lambda stage: None)
+
+        notify("read_image")
         image = image.convert("RGB")
+
+        notify("detect_components")
         detections = self.detect(image)
+
+        notify("detect_crossings")
         crossings = self.crossings(image) if self.crossings else []
+
+        notify("orientation")
         if self.classify is not None:
             detections, scores = orient(image, detections, self.classify)
         else:
             scores = [{} for _ in detections]
+
+        notify("netting")
         extraction = extract_netlist(
             image,
             detections,
             crossings,
             detect_plain_crossings=self.detect_plain_crossings,
         )
+
+        notify("rule_checks")
         rules = check(extraction)
         return PipelineResult(
             netlist=extraction.netlist,

@@ -33,3 +33,4 @@ results/
 # Local tooling
 .kiro/
 demo/data/
+demo/uploads/

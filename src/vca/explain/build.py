@@ -34,7 +34,19 @@ def build_circuit_record(
     verifier_probs: dict[str, float],
     note: str,
     image_size: tuple[int, int] | None,
+    circuit_id: str | None = None,
+    score: dict | None = None,
 ) -> dict:
+    """``circuit_id``/``score`` are optional: a live analysis of a new
+    image has no golden netlist, so there is no ``score`` to copy an
+    evaluation block from. The saved-data build path (``circuit_id`` left
+    as ``None``) keeps reading both from ``prediction["score"]`` for
+    backward compatibility with the batch build script."""
+    if score is None and "score" in prediction:
+        score = prediction["score"]
+    if circuit_id is None:
+        circuit_id = prediction["score"]["circuit_id"]
+
     netlist = prediction["netlist"]
     graph = CircuitGraph.build(netlist)
 
@@ -52,7 +64,6 @@ def build_circuit_record(
     layer2 = build_layer2(graph, blocks)
     layer3 = build_layer3(graph, component_flag_rows)
 
-    score = prediction["score"]
     flagged_count = sum(
         1 for f in component_flag_rows.values() if f["level"] == "needs check"
     )
@@ -79,24 +90,9 @@ def build_circuit_record(
         for raw_name, endpoints in graph.net_endpoints.items()
     ]
 
-    record = {
-        "id": prediction["score"]["circuit_id"],
-        "image": prediction["image"],
-        "image_width": image_size[0] if image_size else None,
-        "image_height": image_size[1] if image_size else None,
-        "components": components_out,
-        "nets": nets_out,
-        "flags": {
-            "circuit": circuit_level_flags,
-            "flagged_count": flagged_count,
-        },
-        "explanation": {
-            "layer1_overview": layer1,
-            "layer2_blocks": layer2,
-            "layer3_details": layer3,
-        },
-        "flagged_count": flagged_count,
-        "evaluation": {
+    evaluation = None
+    if score is not None:
+        evaluation = {
             "evaluation_only": True,
             "ned": score["ned"],
             "ned_lower_bound": score["ned_lower_bound"],
@@ -112,7 +108,26 @@ def build_circuit_record(
                 }
             ),
             "note": note,
+        }
+
+    record = {
+        "id": circuit_id,
+        "image": prediction["image"],
+        "image_width": image_size[0] if image_size else None,
+        "image_height": image_size[1] if image_size else None,
+        "components": components_out,
+        "nets": nets_out,
+        "flags": {
+            "circuit": circuit_level_flags,
+            "flagged_count": flagged_count,
         },
+        "explanation": {
+            "layer1_overview": layer1,
+            "layer2_blocks": layer2,
+            "layer3_details": layer3,
+        },
+        "flagged_count": flagged_count,
+        "evaluation": evaluation,
     }
     return record
 

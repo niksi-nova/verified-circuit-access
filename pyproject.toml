@@ -27,6 +27,13 @@ train = [
     "torchvision==0.29.2",
     "scikit-learn==1.9.1",
 ]
+# Local analysis engine (FastAPI). Needs --extra train too (ultralytics,
+# torch, scikit-learn/joblib) to actually run the pipeline and verifier.
+api = [
+    "fastapi>=0.162.5",
+    "python-multipart>=0.0.33",
+    "uvicorn[standard]>=0.54.0",
+]
 
 [dependency-groups]
 dev = [
@@ -38,6 +45,7 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+markers = ["slow: real-weights integration tests (loads models, runs inference)"]
 
 [tool.ruff]
 line-length = 88
