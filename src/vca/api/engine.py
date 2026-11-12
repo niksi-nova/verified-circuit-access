@@ -17,6 +17,7 @@ from PIL import Image
 from vca.explain.build import build_circuit_record, text_layers
 from vca.netting.orient import YoloClassifiers
 from vca.outputs.braille import braille_output
+from vca.outputs.tactile import tactile_output
 from vca.pipeline import STAGES, Pipeline, YoloCrossings, YoloDetector
 
 ALL_STAGES: tuple[str, ...] = (*STAGES, "verifier", "explanation")
@@ -173,6 +174,18 @@ class Engine:
             record["braille"] = braille_output(text_layers(record)["all"])
         except (OSError, ValueError, RuntimeError, subprocess.SubprocessError):
             logging.getLogger(__name__).exception("Braille translation failed")
+        tactile_features = [
+            feature | {"mirrored": report.layout.mirrored}
+            for feature, report in zip(
+                result.component_features, result.extraction.components, strict=True
+            )
+        ]
+        try:
+            record["tactile"] = tactile_output(
+                record["netlist"], image.size, tactile_features
+            )
+        except ValueError:
+            logging.getLogger(__name__).exception("Raised diagram generation failed")
         record.pop("evaluation", None)
         record["image_url"] = f"/api/runs/{sha256}/image"
         record["verifier_source"] = verifier_source_label

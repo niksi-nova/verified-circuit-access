@@ -79,6 +79,7 @@ export interface Circuit {
   flagged_count: number;
   evaluation?: Evaluation | null;
   braille?: BrailleOutput | null;
+  tactile?: Record<"A4" | "Letter", { kind: "diagram" | "connections"; svg: string }>;
   netlist?: {
     components: { id: string; canonical_category: string }[];
     nets: { name: string }[];

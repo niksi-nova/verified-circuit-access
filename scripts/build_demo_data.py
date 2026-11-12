@@ -32,6 +32,7 @@ from vca.explain.build import (  # noqa: E402
 from vca.explain.status import build_status  # noqa: E402
 from vca.explain.verifier_source import verifier_probs  # noqa: E402
 from vca.outputs.braille import braille_output  # noqa: E402
+from vca.outputs.tactile import tactile_output  # noqa: E402
 
 
 def load_predictions(pipeline_run: Path) -> dict[str, dict]:
@@ -103,6 +104,9 @@ def main(argv: list[str] | None = None) -> int:
             brf_dir = args.out / "braille"
             brf_dir.mkdir(parents=True, exist_ok=True)
             (brf_dir / f"{circuit_id}.brf").write_bytes(braille["brf"].encode("ascii"))
+        record["tactile"] = tactile_output(
+            record["netlist"], image_size, prediction["components"]
+        )
         records.append(record)
 
     problems = [p for record in records for p in validate_record(record)]
