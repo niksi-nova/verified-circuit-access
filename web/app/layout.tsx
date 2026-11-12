@@ -36,7 +36,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${heading.variable} ${body.variable} ${mono.variable}`}>
+    <html
+      lang="en"
+      className={`${heading.variable} ${body.variable} ${mono.variable}`}
+      suppressHydrationWarning
+    >
       <body>
         <ThemeInitScript />
         <a href="#main" className="skip-link">

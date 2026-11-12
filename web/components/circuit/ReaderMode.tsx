@@ -69,12 +69,14 @@ export function ReaderMode({
   lineSpacing: LineSpacing;
   shortcutsDisabled: boolean;
 }) {
-  const [openSections, setOpenSections] = useState({ 1: true, 2: false, 3: false });
   const [followIndex, setFollowIndex] = useState<number | null>(null);
   const [highlightIds, setHighlightIds] = useState<string[]>([]);
   const [announcement, setAnnouncement] = useState("");
   const canSpeak = useMemo(() => speechSupported(), []);
   const containerRef = useRef<HTMLDivElement>(null);
+  const section1Ref = useRef<HTMLDetailsElement>(null);
+  const section2Ref = useRef<HTMLDetailsElement>(null);
+  const section3Ref = useRef<HTMLDetailsElement>(null);
 
   const order = useMemo(() => followTheWireOrder(circuit), [circuit]);
 
@@ -93,8 +95,8 @@ export function ReaderMode({
     function onKeyDown(e: KeyboardEvent) {
       if (shortcutsDisabled || isTypingTarget(e.target)) return;
       if (e.key === "1" || e.key === "2" || e.key === "3") {
-        const n = Number(e.key) as 1 | 2 | 3;
-        setOpenSections((prev) => ({ ...prev, [n]: !prev[n] }));
+        const el = { "1": section1Ref, "2": section2Ref, "3": section3Ref }[e.key].current;
+        if (el) el.open = !el.open;
       } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
         e.preventDefault();
         goTo((followIndex ?? -1) + 1);
@@ -150,11 +152,7 @@ export function ReaderMode({
         </p>
       </section>
 
-      <details
-        className={styles.section}
-        open={openSections[1]}
-        onToggle={(e) => setOpenSections((prev) => ({ ...prev, 1: e.currentTarget.open }))}
-      >
+      <details className={styles.section} ref={section1Ref} open>
         <summary>
           Overview <span className={styles.key}>1</span>
         </summary>
@@ -163,11 +161,7 @@ export function ReaderMode({
         ))}
       </details>
 
-      <details
-        className={styles.section}
-        open={openSections[2]}
-        onToggle={(e) => setOpenSections((prev) => ({ ...prev, 2: e.currentTarget.open }))}
-      >
+      <details className={styles.section} ref={section2Ref}>
         <summary>
           Possible blocks <span className={styles.key}>2</span>
         </summary>
@@ -176,11 +170,7 @@ export function ReaderMode({
         ))}
       </details>
 
-      <details
-        className={styles.section}
-        open={openSections[3]}
-        onToggle={(e) => setOpenSections((prev) => ({ ...prev, 3: e.currentTarget.open }))}
-      >
+      <details className={styles.section} ref={section3Ref}>
         <summary>
           Part-by-part detail <span className={styles.key}>3</span>
         </summary>
