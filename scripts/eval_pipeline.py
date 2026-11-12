@@ -57,6 +57,12 @@ def score(job: tuple[str, str, str, float]) -> dict:
     circuit_id, predicted_json, golden_path, timeout = job
     predicted = Netlist.model_validate_json(predicted_json)
     (truth,) = load_validation_netlist(Path(golden_path))
+    return score_netlists(circuit_id, predicted, truth, timeout)
+
+
+def score_netlists(
+    circuit_id: str, predicted: Netlist, truth: Netlist, timeout: float
+) -> dict:
     alignment = align(predicted, truth, timeout=timeout)
     precision, recall = connection_scores(predicted, truth, alignment)
     return {
