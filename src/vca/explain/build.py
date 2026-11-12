@@ -70,7 +70,12 @@ def build_circuit_record(
         )
 
     nets_out = [
-        {"id": raw_name, "label": graph.label_of(raw_name), "fanout": len(endpoints)}
+        {
+            "id": raw_name,
+            "label": graph.label_of(raw_name),
+            "fanout": len(endpoints),
+            "components": sorted({comp_id for comp_id, _ in endpoints}),
+        }
         for raw_name, endpoints in graph.net_endpoints.items()
     ]
 
