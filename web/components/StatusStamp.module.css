@@ -1,0 +1,25 @@
+.stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border: 1.5px solid currentColor;
+  border-radius: var(--radius);
+  transform: rotate(-1deg);
+}
+
+.unreviewed {
+  color: var(--color-text-muted);
+}
+
+.needsCheck {
+  color: var(--color-accent);
+}
+
+.confirmed {
+  color: var(--color-ink);
+}

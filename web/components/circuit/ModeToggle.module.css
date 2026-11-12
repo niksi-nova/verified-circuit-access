@@ -1,0 +1,18 @@
+.group {
+  display: inline-flex;
+  border: 1.5px solid var(--color-ink);
+}
+
+.item {
+  font-family: var(--font-heading);
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  color: var(--color-ink);
+  border: none;
+  cursor: pointer;
+}
+
+.item[data-state="on"] {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}

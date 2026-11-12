@@ -1,0 +1,44 @@
+.cell {
+  display: inline-grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 2px;
+  width: 0.65em;
+  height: 1em;
+  vertical-align: middle;
+}
+
+.dot {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.18;
+}
+
+.on {
+  opacity: 1;
+}
+
+.spin {
+  animation: spin 1.1s steps(6) infinite;
+}
+
+@keyframes spin {
+  0% {
+    opacity: 0.18;
+  }
+  16.6% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.18;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin .dot {
+    animation: none;
+    opacity: 0.6;
+  }
+}

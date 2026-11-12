@@ -1,0 +1,93 @@
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+.follow {
+  border: 1px solid var(--color-rule);
+  padding: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.followButtons {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  margin-top: var(--space-2);
+}
+
+.followButtons button {
+  font-family: var(--font-body);
+  padding: var(--space-2) var(--space-3);
+  border: 1.5px solid var(--color-ink);
+  background: transparent;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.followButtons button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.announcement {
+  margin-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+}
+
+.diagramDetails summary {
+  cursor: pointer;
+  font-family: var(--font-heading);
+  margin-bottom: var(--space-2);
+}
+
+.section {
+  border-top: 1px solid var(--color-rule);
+  padding: var(--space-3) 0;
+}
+
+.section summary {
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.key {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  border: 1px solid var(--color-rule);
+  padding: 0 4px;
+}
+
+.sentence {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: var(--space-2) 0;
+}
+
+.sourceButton {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  border: 1px solid var(--color-rule);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.speakButton {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  border: 1px solid var(--color-rule);
+  background: transparent;
+  color: var(--color-ink);
+  cursor: pointer;
+  padding: 2px 6px;
+  margin-left: var(--space-2);
+}
