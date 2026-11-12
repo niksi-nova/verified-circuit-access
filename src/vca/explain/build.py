@@ -116,6 +116,7 @@ def build_circuit_record(
         "image_width": image_size[0] if image_size else None,
         "image_height": image_size[1] if image_size else None,
         "components": components_out,
+        "netlist": netlist,
         "nets": nets_out,
         "flags": {
             "circuit": circuit_level_flags,

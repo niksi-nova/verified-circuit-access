@@ -52,3 +52,33 @@
   min-width: 40ch;
   line-height: 1.4;
 }
+
+.calculation {
+  border: 1px solid var(--color-rule);
+  margin-block: var(--space-3);
+  padding: var(--space-3);
+}
+
+.calculation summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.calculation fieldset {
+  border: 0;
+  margin: 0;
+  padding: var(--space-2) 0;
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+}
+
+.calculation input,
+.calculation select {
+  margin-inline-start: var(--space-2);
+  max-width: 100%;
+}
+
+.deck {
+  overflow: auto;
+}

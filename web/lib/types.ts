@@ -79,6 +79,10 @@ export interface Circuit {
   flagged_count: number;
   evaluation?: Evaluation | null;
   braille?: BrailleOutput | null;
+  netlist?: {
+    components: { id: string; canonical_category: string }[];
+    nets: { name: string }[];
+  };
   image_url?: string;
   verifier_source?: string;
   warnings?: string[];

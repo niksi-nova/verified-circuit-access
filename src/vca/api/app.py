@@ -17,6 +17,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from vca.api.engine import Engine, EngineStartupError
 from vca.api.jobs import JobManager
 from vca.api.storage import MAX_UPLOAD_BYTES, RunStore, UploadError, validate_upload
+from vca.outputs.spice import SpiceRequest, simulate
 
 ROOT = Path(__file__).resolve().parents[3]
 UPLOADS_DIR = ROOT / "demo" / "uploads"
@@ -226,3 +227,11 @@ def run_text(run_id: str, layer: str):
         media_type="text/plain",
         filename=f"{run_id[:12]}.{layer}.txt",
     )
+
+
+@app.post("/api/calculate")
+def calculate(request: SpiceRequest):
+    try:
+        return simulate(request)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from None

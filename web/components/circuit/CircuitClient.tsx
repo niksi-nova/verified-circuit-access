@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ControlsPanel, type LineSpacing, type TextSize } from "@/components/circuit/ControlsPanel";
+import { Calculation, type SpiceResult } from "@/components/circuit/Calculation";
 import { Downloads } from "@/components/circuit/Downloads";
 import { ModeToggle, type Mode } from "@/components/circuit/ModeToggle";
 import { ReaderMode } from "@/components/circuit/ReaderMode";
@@ -24,6 +25,7 @@ export function CircuitClient({
   embedded?: boolean;
   verifierNote: string;
 }) {
+  const [calculation, setCalculation] = useState<SpiceResult>();
   const [mode, setMode] = useState<Mode>("reader");
   const [textSize, setTextSize] = useState<TextSize>("normal");
   const [lineSpacing, setLineSpacing] = useState<LineSpacing>("normal");
@@ -86,10 +88,14 @@ export function CircuitClient({
           shortcutsDisabled={shortcutsOff}
         />
       ) : (
-        <ReviewMode circuit={circuit} />
+        <>
+          <Calculation circuit={circuit} result={calculation} onResult={setCalculation} />
+          <ReviewMode circuit={circuit} />
+        </>
       )}
 
-      <Downloads circuit={circuit} textDownloads={textDownloads} />
+      <Downloads circuit={circuit} textDownloads={textDownloads}
+        calculation={calculation} onReview={() => setMode("review")} />
 
       <p
         style={{

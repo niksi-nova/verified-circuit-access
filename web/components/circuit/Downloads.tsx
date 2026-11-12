@@ -1,6 +1,7 @@
 "use client";
 
 import * as Tabs from "@radix-ui/react-tabs";
+import { CalculationResult, type SpiceResult } from "./Calculation";
 import type { Circuit } from "@/lib/types";
 import styles from "./Downloads.module.css";
 
@@ -14,9 +15,13 @@ const LAYER_LABELS: Record<string, string> = {
 export function Downloads({
   textDownloads,
   circuit,
+  calculation,
+  onReview,
 }: {
   textDownloads: Record<string, string>;
   circuit: Circuit;
+  calculation?: SpiceResult;
+  onReview: () => void;
 }) {
   return (
     <Tabs.Root defaultValue="text" className={styles.tabs}>
@@ -76,7 +81,12 @@ export function Downloads({
       </Tabs.Content>
 
       <Tabs.Content value="ngspice" className={styles.tabContent}>
-        <p className={styles.notRun}>not run</p>
+        {calculation ? <CalculationResult result={calculation} /> : (
+          <>
+            <p className={styles.notRun}>not run</p>
+            <button type="button" onClick={onReview}>Open teacher review to add values</button>
+          </>
+        )}
       </Tabs.Content>
     </Tabs.Root>
   );
