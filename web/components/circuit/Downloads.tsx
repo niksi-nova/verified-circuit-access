@@ -1,6 +1,7 @@
 "use client";
 
 import * as Tabs from "@radix-ui/react-tabs";
+import type { Circuit } from "@/lib/types";
 import styles from "./Downloads.module.css";
 
 const LAYER_LABELS: Record<string, string> = {
@@ -12,8 +13,10 @@ const LAYER_LABELS: Record<string, string> = {
 
 export function Downloads({
   textDownloads,
+  circuit,
 }: {
   textDownloads: Record<string, string>;
+  circuit: Circuit;
 }) {
   return (
     <Tabs.Root defaultValue="text" className={styles.tabs}>
@@ -50,7 +53,22 @@ export function Downloads({
       </Tabs.Content>
 
       <Tabs.Content value="braille" className={styles.tabContent}>
-        <p className={styles.notRun}>not run</p>
+        {circuit.braille ? (
+          <>
+            <p>Liblouis table {circuit.braille.table}. This output is not proofread by a braille reader.</p>
+            <a className={styles.downloadLink}
+              href={`data:application/octet-stream,${encodeURIComponent(circuit.braille.brf)}`}
+              download={`circuit-${circuit.id}.brf`}>
+              Download BRF
+            </a>
+            {circuit.braille.pages.map((page, i) => (
+              <figure className={styles.braillePage} key={i}>
+                <figcaption>Page {i + 1}</figcaption>
+                <pre>{page}</pre>
+              </figure>
+            ))}
+          </>
+        ) : <p className={styles.notRun}>not run</p>}
       </Tabs.Content>
 
       <Tabs.Content value="tactile" className={styles.tabContent}>

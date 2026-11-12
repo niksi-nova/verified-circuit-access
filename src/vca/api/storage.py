@@ -138,6 +138,8 @@ class RunStore:
         text_dir.mkdir(exist_ok=True)
         for name, text in text_layers.items():
             (text_dir / f"{name}.txt").write_text(text + "\n", encoding="utf-8")
+        if braille := record.get("braille"):
+            (run_dir / "explanation.brf").write_bytes(braille["brf"].encode("ascii"))
         for name, value in (("result", record), ("meta", meta)):
             temp = run_dir / f"{name}.tmp"
             temp.write_text(json.dumps(value, indent=1), encoding="utf-8")

@@ -89,7 +89,7 @@ export function CircuitClient({
         <ReviewMode circuit={circuit} />
       )}
 
-      <Downloads textDownloads={textDownloads} />
+      <Downloads circuit={circuit} textDownloads={textDownloads} />
 
       <p
         style={{

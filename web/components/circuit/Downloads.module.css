@@ -40,3 +40,15 @@
   color: var(--color-text-muted);
   font-family: var(--font-mono);
 }
+
+.braillePage {
+  margin-inline: 0;
+  max-width: 100%;
+  overflow: auto;
+}
+
+.braillePage pre {
+  width: max-content;
+  min-width: 40ch;
+  line-height: 1.4;
+}

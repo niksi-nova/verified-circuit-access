@@ -6,14 +6,17 @@ either runs the real pipeline or raises.
 from __future__ import annotations
 
 import json
+import logging
 import os
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
 from PIL import Image
 
-from vca.explain.build import build_circuit_record
+from vca.explain.build import build_circuit_record, text_layers
 from vca.netting.orient import YoloClassifiers
+from vca.outputs.braille import braille_output
 from vca.pipeline import STAGES, Pipeline, YoloCrossings, YoloDetector
 
 ALL_STAGES: tuple[str, ...] = (*STAGES, "verifier", "explanation")
@@ -166,6 +169,10 @@ class Engine:
             circuit_id=sha256[:12],
             score=None,
         )
+        try:
+            record["braille"] = braille_output(text_layers(record)["all"])
+        except (OSError, ValueError, RuntimeError, subprocess.SubprocessError):
+            logging.getLogger(__name__).exception("Braille translation failed")
         record.pop("evaluation", None)
         record["image_url"] = f"/api/runs/{sha256}/image"
         record["verifier_source"] = verifier_source_label

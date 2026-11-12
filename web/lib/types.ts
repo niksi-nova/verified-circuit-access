@@ -57,6 +57,12 @@ export interface Evaluation {
   note: string;
 }
 
+export interface BrailleOutput {
+  table: string;
+  brf: string;
+  pages: string[];
+}
+
 export interface Circuit {
   id: string;
   image: string;
@@ -72,6 +78,7 @@ export interface Circuit {
   };
   flagged_count: number;
   evaluation?: Evaluation | null;
+  braille?: BrailleOutput | null;
   image_url?: string;
   verifier_source?: string;
   warnings?: string[];

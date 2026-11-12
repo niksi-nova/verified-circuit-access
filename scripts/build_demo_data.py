@@ -31,6 +31,7 @@ from vca.explain.build import (  # noqa: E402
 )
 from vca.explain.status import build_status  # noqa: E402
 from vca.explain.verifier_source import verifier_probs  # noqa: E402
+from vca.outputs.braille import braille_output  # noqa: E402
 
 
 def load_predictions(pipeline_run: Path) -> dict[str, dict]:
@@ -96,6 +97,12 @@ def main(argv: list[str] | None = None) -> int:
         record = build_circuit_record(
             prediction, probs_by_circuit.get(circuit_id, {}), note, image_size
         )
+        braille = braille_output(text_layers(record)["all"])
+        if braille:
+            record["braille"] = braille
+            brf_dir = args.out / "braille"
+            brf_dir.mkdir(parents=True, exist_ok=True)
+            (brf_dir / f"{circuit_id}.brf").write_bytes(braille["brf"].encode("ascii"))
         records.append(record)
 
     problems = [p for record in records for p in validate_record(record)]
