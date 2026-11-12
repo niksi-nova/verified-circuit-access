@@ -12,6 +12,7 @@ export function dataAvailable(): boolean {
 }
 
 export function getAllCircuits(): Circuit[] {
+  if (!dataAvailable()) return [];
   if (!circuitsCache) {
     const raw = fs.readFileSync(path.join(DATA_DIR, "circuits.json"), "utf-8");
     circuitsCache = JSON.parse(raw) as Circuit[];

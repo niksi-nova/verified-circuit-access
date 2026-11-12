@@ -1,11 +1,9 @@
-import { getStatus } from "@/lib/data";
+import { OutputStatus } from "@/components/OutputStatus";
+import { getAllCircuits, getStatus } from "@/lib/data";
 import type { MetricsBlock } from "@/lib/types";
 import styles from "./page.module.css";
 
-const NOT_RUN = [
-  "Braille (.brf) output",
-  "ngspice electrical calculations",
-  "Tactile SVG generation",
+const EVALUATIONS_NOT_RUN = [
   "Comparison with a general-purpose vision model",
   "Evaluation on a textbook test set",
   "A comprehension evaluation with real readers",
@@ -41,6 +39,7 @@ function MetricsTable({ title, block }: { title: string; block: MetricsBlock }) 
 
 export default function StatusPage() {
   const status = getStatus();
+  const circuits = getAllCircuits();
 
   return (
     <div className={styles.wrap}>
@@ -54,7 +53,7 @@ export default function StatusPage() {
         <p>not available — run <code>scripts/build_demo_data.py</code> first.</p>
       ) : (
         <>
-          <MetricsTable title="Netlist pipeline (122 circuits)" block={status.pipeline} />
+          <MetricsTable title="Netlist pipeline" block={status.pipeline} />
           <MetricsTable title="Error checker (verifier)" block={status.verifier} />
           <MetricsTable title="Symbol detector" block={status.detector} />
           <MetricsTable title="Wire crossing detector" block={status.crossing} />
@@ -65,10 +64,14 @@ export default function StatusPage() {
         </>
       )}
 
-      <h2>Not run</h2>
-      <p>These have not been built or evaluated yet:</p>
+      <OutputStatus
+        libraryBraille={circuits.some((circuit) => Boolean(circuit.braille))}
+        libraryTactile={circuits.some((circuit) => Boolean(circuit.tactile))}
+      />
+
+      <h2>Evaluations still to run</h2>
       <ul className={styles.notRunList}>
-        {NOT_RUN.map((item) => (
+        {EVALUATIONS_NOT_RUN.map((item) => (
           <li key={item}>{item}</li>
         ))}
       </ul>

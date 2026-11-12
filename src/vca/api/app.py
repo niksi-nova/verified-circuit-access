@@ -17,7 +17,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from vca.api.engine import Engine, EngineStartupError
 from vca.api.jobs import JobManager
 from vca.api.storage import MAX_UPLOAD_BYTES, RunStore, UploadError, validate_upload
-from vca.outputs.spice import SpiceRequest, simulate
+from vca.outputs.spice import SpiceRequest, available, simulate
 
 ROOT = Path(__file__).resolve().parents[3]
 UPLOADS_DIR = ROOT / "demo" / "uploads"
@@ -74,6 +74,12 @@ def health():
         "version": version("verified-circuit-access"),
         "models_loaded": state.engine_state == "ready",
         "engine_ready": state.engine_state == "ready",
+    }
+    runs = state.store.list_runs() if state.store is not None else []
+    body["outputs"] = {
+        "braille": any(run.get("braille") for run in runs),
+        "tactile": any(run.get("tactile") for run in runs),
+        "ngspice_available": available(),
     }
     if state.engine is not None:
         info = state.engine.info()

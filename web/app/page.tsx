@@ -18,8 +18,8 @@ export default function HomePage() {
           <li>The machine reads the parts and their connections.</li>
           <li>A teacher checks the reading and can sign off.</li>
           <li>
-            The student reads, hears or feels it. Text and read-aloud are available.
-            Braille and raised diagram are <strong>not run</strong>.
+            The student reads, hears or feels it. Use text, read-aloud, or the
+            braille and raised-diagram outputs when available.
           </li>
         </ol>
       </section>

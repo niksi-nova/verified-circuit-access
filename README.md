@@ -1,82 +1,91 @@
 # VERIFIED-CIRCUIT-ACCESS
 
-**Verified circuit diagram understanding and accessible explanations for blind and visually impaired students.**
+Braille Press helps blind and low-vision students read circuit diagrams with a
+teacher. A diagram conveys information through symbols, terminal positions and
+wires that a student may otherwise need a sighted reader to interpret. The
+application extracts a machine-read netlist and turns it into a layered
+explanation with component and net references.
 
-VERIFIED-CIRCUIT-ACCESS is a system designed to convert circuit diagram images into structured, verified electrical representations and accessible explanations. It aims to make circuit diagrams easier to understand through screen-reader-friendly descriptions and other accessible representations.
+## Run the local demo
 
-## 1. Project overview
+The engine requires Python 3.11, uv, the archived M2 weights, and the Image2Net
+validation images for the examples and Library. The frontend uses Node.js and
+npm. Liblouis enables BRF and Unicode previews. ngspice enables teacher-entered
+DC calculations. On macOS these optional system packages are available as
+`liblouis` and `ngspice` through Homebrew.
 
-Circuit diagrams contain visual information such as components, terminals, wires, connections, labels, and electrical relationships. For blind and visually impaired students, understanding these diagrams can be difficult because conventional learning materials rely heavily on visual interpretation.
+From the repository root:
 
-This project aims to bridge that gap by developing a pipeline that:
-
-1. Extracts circuit components and connections from circuit diagram images.
-2. Represents the extracted circuit as a structured netlist graph.
-3. Evaluates the correctness of the extracted representation.
-4. Uses verified graph information to generate circuit explanations.
-5. Supports accessible output formats such as screen-reader-friendly text, Braille-compatible descriptions, and tactile diagram representations.
-
-The project prioritizes verification and traceability rather than relying solely on generated explanations.
-
-## 2. System architecture
-
-```mermaid
-flowchart TD
-    A["Circuit Diagram Image"] --> B["Component and Connection Extraction"]
-    B --> C["Structured Netlist"]
-    C --> D["Canonical Circuit Graph"]
-    D --> E["Verification and Evaluation"]
-    E --> F["Verified Circuit Representation"]
-    F --> G["Layered Circuit Explanation"]
-    G --> H["Screen-reader-friendly Output"]
-    G --> I["Braille-compatible Output"]
-    G --> J["Tactile Diagram Representation"]
+```sh
+uv sync --locked --extra train --extra api
+npm --prefix web ci
+uv run --extra train python scripts/build_demo_data.py \
+  --pipeline-run results/m2/pipeline/20261111T171400Z \
+  --verifier-run results/m2/verifier/20261111T171904Z \
+  --images-dir data/image2net/images --out demo/data
+npm --prefix web run sync-data
+npm --prefix web run build
+bash scripts/start_demo.sh
 ```
 
-The intended architecture separates extraction, graph representation, verification, and explanation. This allows the correctness of the underlying circuit representation to be evaluated independently of the generated explanation.
+Open [the production demo](http://127.0.0.1:3017). Use `PORT=3018` before the
+launcher if 3017 is occupied. Ctrl-C stops the frontend and engine.
+For development, run `uv run --extra train --extra api python scripts/serve_api.py`
+and `npm --prefix web run dev -- --hostname 127.0.0.1 --port 3017` in separate
+terminals. The Next.js proxy forwards API requests to the engine at
+`127.0.0.1:8000`.
 
-## 3. Main objectives
+Set `VCA_BRAILLE_TABLE` to choose a compatible six-dot Liblouis table. The
+default is `en-ueb-g1.ctb` for Unified English Braille grade 1. Set
+`VCA_TACTILE_LINE_MM` to change SVG line thickness from the 1.1 mm default.
+Apply these settings when building the Library or starting the engine. Choose
+A4 or Letter in the Raised diagram tab.
 
-- Develop structured schemas for circuit annotations, components, terminals, and electrical connections.
-- Integrate circuit diagram datasets with documented licensing and access conditions.
-- Convert netlists into canonical graph representations.
-- Evaluate extracted circuits using graph-based metrics.
-- Establish a baseline interface for vision-language model predictions.
-- Identify potentially incorrect extractions for review.
-- Ensure numerical explanations are grounded in circuit simulation results.
-- Develop accessible representations suitable for blind and visually impaired students.
+Run `uv run python scripts/prewarm_demo.py` while the engine is up to populate
+the six example caches with fresh CPU results. The interface labels saved
+results and offers **Run again**. Older saved analyses need a fresh run to
+generate the newer outputs.
 
-## 4. Repository status
+## System architecture
 
-The repository contains Milestone 1 (M1) and the code for Milestone 2 (M2): training data, model training, net extraction, rule checks and the end-to-end pipeline. M2 models are being trained on Kaggle; no M2 numbers are reported yet.
+```mermaid
+flowchart LR
+    image["Local circuit image"] --> queue["FastAPI upload validation and job queue"]
+    queue --> detect["Symbol detection, orientation and wire crossings"]
+    detect --> netlist["Terminal and wire extraction to netlist"]
+    netlist --> checks["Electrical rules and component verifier"]
+    checks --> layers["Layered explanation with source references"]
+    layers --> reader["Reader, read-aloud and text downloads"]
+    layers --> braille["Liblouis BRF and Unicode preview"]
+    netlist --> tactile["Raised SVG or parts-and-connections fallback"]
+    netlist --> review["Teacher review and entered DC values"]
+    review --> spice["ngspice deck and numerical results"]
+    layers --> saved["Local saved analysis"]
+    braille --> saved
+    tactile --> saved
+    netlist --> metrics["Offline graph and connection metrics"]
+    truth["Private or Image2Net reference annotations"] --> metrics
+```
 
-| Component | Current status |
+## Project contribution
+
+The prototype combines a schematic netlist, traceable explanations, part-level
+review flags, and a teacher workflow in one local tool. It uses established
+detection, graph evaluation, braille translation, and circuit simulation
+methods. The project has no comparative novelty or learning-outcome study.
+
+## Status
+
+| Area | Current status |
 |---|---|
-| Project configuration and development setup | Implemented |
-| Annotation schema | Implemented |
-| Netlist schema | Implemented |
-| Component taxonomy | Implemented |
-| Image2Net dataset integration | Implemented |
-| Dataset taxonomy audit | Implemented |
-| CGHD PASCAL VOC box loader | Implemented (LTspice netlists not used) |
-| Graph isomorphism metric | Implemented |
-| Normalized graph edit distance (NED) | Implemented |
-| VLM baseline (Claude provider + CLI) | Implemented |
-| Evaluation framework | Implemented |
-| Evaluation overlays | Implemented |
-| Results storage | Implemented |
-| M2 training datasets (detector, orientation, crossing) | Implemented |
-| Model training entry point (`vca.training`, Kaggle notebooks) | Implemented; runs pending |
-| Orientation / mirroring classifiers | Implemented; training pending |
-| Net extraction from boxes and wires | Implemented |
-| Electrical rule checks | Implemented |
-| End-to-end pipeline and evaluation script | Implemented; evaluation pending |
-| Trained component verifier | Not implemented |
-| ngspice-based numerical verification | Not implemented |
-| Accessible explanation generation | Future implementation |
-| Screen-reader, Braille, and tactile output | Future implementation |
-
-**Important:** Implemented infrastructure does not imply that a trained model or complete end-to-end system is available. No trained-model or baseline numbers are reported until the corresponding runs have finished and their provenance is recorded (section 12).
+| Extraction | Pinned M2 CPU pipeline with symbol, crossing and orientation models |
+| Review | Rule checks and component verifier flag parts for teacher review |
+| Try it and Library | Local upload, saved runs, three text layers, read-aloud and text downloads |
+| Braille | Liblouis grade 1 BRF and Unicode preview where generated |
+| Raised output | A4 and Letter vector output, with a labelled connections listing when routes are unclear |
+| Calculation | ngspice DC readings from teacher-entered values on supported circuits |
+| Curriculum evaluation | Annotation kit and evaluator are ready. No figures have been annotated or evaluated. |
+| Saved evaluation | Image2Net pipeline and verifier metrics are shown on the app’s Status page. |
 
 ## 5. Technology stack
 
@@ -402,13 +411,13 @@ No model-performance metrics should be interpreted as established until an actua
 
 | Verification | Status |
 |---|---|
-| Full automated test suite | 180 passed |
+| Full automated test suite | Run the checks below for the current checkout |
 | Ruff checks | Passed |
 | Dataset validation pairs | 122 downloaded/verified locally |
 | Dataset taxonomy audit | 1,573 components; zero unknown labels |
 | Model training | M2 detector, crossing and orientation models trained (Kaggle) |
 | Real VLM evaluation | Pending |
-| Circuit simulation evaluation | Not run |
+| Circuit simulation | Automated series, parallel and divider fixtures. A curriculum evaluation remains pending. |
 | End-to-end accessibility evaluation | Not run |
 
 The test results above refer to the latest recorded project verification. Run the commands below to verify the current checkout independently.
@@ -441,10 +450,10 @@ git clone https://github.com/niksi-nova/verified-circuit-access.git
 cd verified-circuit-access
 ```
 
-If you are working from a feature branch:
+For the Braille Press demo branch:
 
 ```bash
-git switch feat/m1-implementation
+git switch feat/demo-explanation
 ```
 
 ### Option A: Install using pip
@@ -574,24 +583,24 @@ The project follows these principles:
 6. **Dataset compliance:** Data access and licensing requirements must be respected.
 7. **Accessibility:** The final system should support non-visual understanding of circuit diagrams.
 
-## 18. Current limitations and future work
+## Limitations
 
-The current implementation establishes the data, schema, graph, metric, and baseline-evaluation foundations.
-
-The following work remains:
-
-- Improve the component verifier's ranking (AUROC 0.66), e.g. with features from neighbouring components and nets.
-- Retrain the detector for the classes it misses (amplifier triangles, `vdd`, `port`).
-- Calibrate verification confidence and establish teacher-review thresholds.
-- Integrate ngspice for numerical circuit verification.
-- Ground generated explanations in verified graph structures and simulation outputs.
-- Develop layered explanations for different levels of understanding.
-- Generate screen-reader-compatible descriptions.
-- Support Braille-compatible output.
-- Develop tactile circuit diagram representations.
-- Evaluate downstream comprehension with an appropriate real evaluation dataset.
-
-These are future implementation goals, not completed capabilities.
+- Machine-read circuits can miss symbols and misconnect terminals. A teacher can
+  record decisions and sign off in their browser. Review decisions leave the
+  underlying netlist unchanged.
+- The examples come from the evaluation set. New textbook figures still need
+  independent evaluation. The [annotation guide](docs/annotation_guideline.md)
+  explains the private workflow.
+- Braille has not been proofread by a braille reader. Raised graphics have not
+  been validated by a tactile-graphics expert. The routing uses predicted
+  terminals and a conservative clearance test. Most of the current Library uses
+  the labelled connections listing.
+- Calculation is limited to resistors and independent DC voltage and current
+  sources. It requires teacher-entered values and connected nets. The
+  application has no value OCR or simulation support for transistors, diodes,
+  and other electrical parts.
+- The project has no completed comprehension study, blind student or teacher
+  usability study, or general-purpose vision model comparison.
 
 ## 19. Documentation
 
@@ -605,5 +614,5 @@ For implementation details, refer to the corresponding modules under `src/vca/`.
 ---
 
 **Project:** VERIFIED-CIRCUIT-ACCESS
-**Current milestone:** M1 — Foundational implementation and evaluation infrastructure
+**Current milestone:** M2 local demo and output integration
 **Repository:** https://github.com/niksi-nova/verified-circuit-access

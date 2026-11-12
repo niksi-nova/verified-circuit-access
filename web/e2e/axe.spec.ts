@@ -1,5 +1,32 @@
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+
+async function dropExample(page: Page) {
+  const bytes = await readFile(resolve(__dirname, "../../data/image2net/images/015.png"));
+  const transfer = await page.evaluateHandle((data) => {
+    const payload = new DataTransfer();
+    payload.items.add(new File([new Uint8Array(data)], "015.png", { type: "image/png" }));
+    return payload;
+  }, Array.from(bytes));
+  await page.locator("[data-dragging]").dispatchEvent("drop", { dataTransfer: transfer });
+  await transfer.dispose();
+}
+
+test("The offline upload controls retain a selection and keep the picker available", async ({ page }) => {
+  await page.route("**/api/health", (route) => route.fulfill({ json: { status: "offline" } }));
+  await page.goto("/try");
+  await expect(page.getByText("The local analysis engine is offline.")).toBeVisible();
+  const chooser = page.waitForEvent("filechooser");
+  await page.getByRole("button", { name: "Choose an image" }).click();
+  expect(await chooser).toBeTruthy();
+  await dropExample(page);
+  await expect(page.getByText(/015.png selected/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Analyse selected image" })).toBeDisabled();
+  await page.getByRole("button", { name: "Example 015" }).click();
+  await expect(page.getByText(/Example 015 selected/)).toBeVisible();
+});
 
 const THEMES = ["light", "dark"] as const;
 
@@ -59,7 +86,8 @@ for (const theme of THEMES) {
         await route.fulfill({ response });
       }, { times: 1 });
 
-      await page.getByRole("button", { name: "Example 015" }).click();
+      if (theme === "dark") await dropExample(page);
+      else await page.getByRole("button", { name: "Example 015" }).click();
       await expect(page).toHaveURL(/run=[a-f0-9]{64}&job=/);
       try {
         await expect(page.getByRole("heading", { name: "2. Reading the circuit" })).toBeVisible();
@@ -72,7 +100,19 @@ for (const theme of THEMES) {
       await expect(heading).toBeFocused({ timeout: 40_000 });
       await expect(page.getByText("Machine-read, not yet checked by a teacher")).toBeVisible();
       await expectAccessible(page);
-      await page.getByText("Review (teacher)").click();
+      await page.getByRole("tab", { name: "Braille preview" }).click();
+      await expect(page.getByRole("link", { name: "Download BRF" })).toBeVisible();
+      await expectAccessible(page);
+      await page.getByRole("tab", { name: "Raised diagram" }).click();
+      await page.getByLabel("Page size").selectOption("Letter");
+      await expect(page.getByRole("link", { name: "Download SVG" })).toHaveAttribute("download", /-Letter\.svg$/);
+      await expectAccessible(page);
+      await page.getByRole("tab", { name: "Calculation" }).click();
+      await expect(page.getByRole("tabpanel")).toContainText("not run");
+      await expectAccessible(page);
+      await page.getByRole("button", { name: "Open teacher review to add values" }).click();
+      await page.getByText("Add values to calculate").click();
+      await expect(page.getByText(/Not supported yet:.*mos/)).toBeVisible();
       await expectAccessible(page);
       await page.reload();
       await expect(page.getByText(/Saved result from/)).toBeVisible();

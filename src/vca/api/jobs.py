@@ -145,6 +145,8 @@ class JobManager:
                 "verifier_source": record.get("verifier_source"),
                 "warnings": record.get("warnings", []),
                 "extension": job.extension,
+                "braille": bool(record.get("braille")),
+                "tactile": bool(record.get("tactile")),
             }
             with self._lock:
                 if job.cancel_requested:
