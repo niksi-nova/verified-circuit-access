@@ -2,7 +2,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-port="${PORT:-3000}"
+port="${PORT:-3017}"
 engine_pid=
 web_pid=
 cleanup() {
@@ -18,12 +18,14 @@ if [[ ! -f web/.next/BUILD_ID ]]; then
   echo 'Build the frontend first with: npm --prefix web run build' >&2
   exit 1
 fi
-for local_port in 8000 "$port"; do
-  if lsof -nP -iTCP:"$local_port" -sTCP:LISTEN 2>/dev/null | grep -q "IPv4"; then
-    echo "Port $local_port is already in use. Stop the existing listener and retry." >&2
-    exit 1
-  fi
-done
+if lsof -nP -iTCP:8000 -sTCP:LISTEN 2>/dev/null | grep -q "IPv4"; then
+  echo "Port 8000 is already in use. Stop the existing engine and retry." >&2
+  exit 1
+fi
+if lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
+  echo "Port $port is already in use. Choose a free port with PORT=..." >&2
+  exit 1
+fi
 
 uv run --locked --offline --extra train --extra api python scripts/serve_api.py &
 engine_pid=$!

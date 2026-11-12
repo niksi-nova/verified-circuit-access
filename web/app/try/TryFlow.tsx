@@ -67,6 +67,7 @@ export function TryFlow() {
   const [useSaved, setUseSaved] = useState(true);
   const [progress, setProgress] = useState<Job>();
   const [result, setResult] = useState<(Result & { run: string })>();
+  const [pending, setPending] = useState<{ name: string; load: () => Promise<Blob> }>();
   const [busy, setBusy] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -155,6 +156,7 @@ export function TryFlow() {
         body: form,
       });
       setResult(undefined);
+      setPending(undefined);
       window.history.pushState(null, "", tryUrl(job.sha256, job.job_id));
     } catch (cause) {
       setError(message(cause));
@@ -162,6 +164,12 @@ export function TryFlow() {
       setBusy(false);
       uploadInFlight.current = false;
     }
+  }
+
+  function selectImage(name: string, load: () => Promise<Blob>) {
+    setError("");
+    setPending({ name, load });
+    if (ready) void submit(load, useSaved);
   }
 
   async function fetchImage(url: string) {
@@ -194,6 +202,7 @@ export function TryFlow() {
 
   function reset() {
     setResult(undefined);
+    setPending(undefined);
     setError("");
     setNotice("");
     window.history.pushState(null, "", tryUrl(null));
@@ -251,19 +260,19 @@ export function TryFlow() {
           <div
             className={styles.drop}
             data-dragging={dragging}
-            onDragOver={(event) => { event.preventDefault(); if (ready) setDragging(true); }}
+            onDragOver={(event) => { event.preventDefault(); setDragging(true); }}
             onDragLeave={() => setDragging(false)}
             onDrop={(event) => {
               event.preventDefault();
               setDragging(false);
               const file = event.dataTransfer.files[0];
-              if (file) void submit(async () => file, useSaved);
+              if (file) selectImage(file.name, async () => file);
             }}
             onPaste={(event) => {
               const file = event.clipboardData.files[0];
               if (file) {
                 event.preventDefault();
-                void submit(async () => file, useSaved);
+                selectImage(file.name || "Clipboard image", async () => file);
               }
             }}
           >
@@ -274,18 +283,27 @@ export function TryFlow() {
               onChange={(event) => {
                 const file = event.currentTarget.files?.[0];
                 event.currentTarget.value = "";
-                if (file) void submit(async () => file, useSaved);
+                if (file) selectImage(file.name, async () => file);
               }}
             />
-            <button type="button" disabled={!ready} onClick={() => input.current?.click()}>Choose an image</button>
+            <button type="button" onClick={() => input.current?.click()}>Choose an image</button>
           </div>
+
+          {pending && (
+            <div>
+              <p role="status">{pending.name} selected. {ready ? "Ready to send." : "Waiting for the local engine."}</p>
+              <button type="button" disabled={!ready} onClick={() => submit(pending.load, useSaved)}>
+                Analyse selected image
+              </button>
+            </div>
+          )}
 
           <h3>Examples</h3>
           <p>These examples come from our evaluation set. How well this works on new textbook figures has not been measured yet.</p>
           <ul className={styles.examples}>
             {EXAMPLES.map((id) => (
               <li key={id}>
-                <button type="button" disabled={!ready} onClick={() => submit(() => fetchImage(`/api/examples/${id}`), useSaved)}>
+                <button type="button" onClick={() => selectImage(`Example ${id}`, () => fetchImage(`/api/examples/${id}`))}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={`/api/examples/${id}`} alt="" width={108} height={76} />
                   Example {id}
