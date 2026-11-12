@@ -49,3 +49,18 @@
   color: var(--color-text-muted);
   font-size: 0.85rem;
 }
+
+.primary {
+  display: inline-block;
+  border: 2px solid currentColor;
+  border-radius: 0.25rem;
+  padding: 0.65rem 1.15rem;
+  margin-block: var(--space-3);
+  font-weight: 700;
+}
+
+.steps {
+  display: grid;
+  gap: var(--space-3);
+  padding-inline-start: 1.5rem;
+}

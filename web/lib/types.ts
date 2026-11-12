@@ -71,7 +71,10 @@ export interface Circuit {
     layer3_details: ExplanationSentence[];
   };
   flagged_count: number;
-  evaluation: Evaluation;
+  evaluation?: Evaluation | null;
+  image_url?: string;
+  verifier_source?: string;
+  warnings?: string[];
 }
 
 export type ReviewStatus = "unreviewed" | "needs-check" | "teacher-confirmed";

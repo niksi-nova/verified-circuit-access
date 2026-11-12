@@ -24,7 +24,9 @@ export default async function CircuitPage({ params }: PageProps<"/circuit/[id]">
   return (
     <CircuitClient
       circuit={circuit}
-      availableTextLayers={availableTextLayers(id)}
+      textDownloads={Object.fromEntries(availableTextLayers(id).map((layer) => [
+        layer, `/data/text/${id}.${layer}.txt`,
+      ]))}
       verifierNote={verifierNote}
     />
   );

@@ -11,11 +11,9 @@ const LAYER_LABELS: Record<string, string> = {
 };
 
 export function Downloads({
-  circuitId,
-  availableTextLayers,
+  textDownloads,
 }: {
-  circuitId: string;
-  availableTextLayers: string[];
+  textDownloads: Record<string, string>;
 }) {
   return (
     <Tabs.Root defaultValue="text" className={styles.tabs}>
@@ -27,22 +25,22 @@ export function Downloads({
           Braille preview
         </Tabs.Trigger>
         <Tabs.Trigger className={styles.tabTrigger} value="tactile">
-          Tactile SVG
+          Raised diagram
         </Tabs.Trigger>
         <Tabs.Trigger className={styles.tabTrigger} value="ngspice">
-          ngspice values
+          Calculation
         </Tabs.Trigger>
       </Tabs.List>
 
       <Tabs.Content value="text" className={styles.tabContent}>
-        {availableTextLayers.length === 0 ? (
+        {Object.keys(textDownloads).length === 0 ? (
           <p className={styles.notRun}>not run</p>
         ) : (
-          availableTextLayers.map((layer) => (
+          Object.entries(textDownloads).map(([layer, url]) => (
             <a
               key={layer}
               className={styles.downloadLink}
-              href={`/data/text/${circuitId}.${layer}.txt`}
+              href={url}
               download
             >
               {LAYER_LABELS[layer] ?? layer}
@@ -52,7 +50,6 @@ export function Downloads({
       </Tabs.Content>
 
       <Tabs.Content value="braille" className={styles.tabContent}>
-        <p>40 cells per line layout is built; no .brf file exists yet for this circuit.</p>
         <p className={styles.notRun}>not run</p>
       </Tabs.Content>
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrailleCell, DIVIDER_PATTERN } from "@/components/BrailleCell";
+import { EngineStatus } from "@/components/EngineStatus";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import styles from "./SiteHeader.module.css";
 
@@ -11,11 +12,13 @@ export function SiteHeader() {
         Braille Press
       </Link>
       <nav className={styles.nav} aria-label="Primary">
-        <Link href="/">Library</Link>
+        <Link href="/try">Try it</Link>
+        <Link href="/library">Library</Link>
         <Link href="/status">Status</Link>
         <Link href="/about">About</Link>
       </nav>
       <div className={styles.right}>
+        <EngineStatus />
         <ThemeToggle />
       </div>
     </header>

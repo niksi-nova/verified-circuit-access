@@ -1,70 +1,28 @@
 import Link from "next/link";
-import { BrailleCell, DIVIDER_PATTERN } from "@/components/BrailleCell";
-import { LibraryList, type CircuitSummary } from "@/components/LibraryList";
-import { dataAvailable, getAllCircuits, START_HERE_CLEAN, START_HERE_FLAGGED } from "@/lib/data";
 import styles from "./page.module.css";
 
-export default function LibraryPage() {
-  if (!dataAvailable()) {
-    return (
-      <div className={styles.wrap}>
-        <h1>Library</h1>
-        <p>
-          No circuit data found at <code>public/data</code>. Run{" "}
-          <code>uv run python scripts/build_demo_data.py ...</code> then{" "}
-          <code>npm run sync-data</code> (or rely on the symlink).
-        </p>
-      </div>
-    );
-  }
-
-  const circuits = getAllCircuits();
-  const summaries: CircuitSummary[] = circuits.map((c) => ({
-    id: c.id,
-    componentCount: c.components.length,
-    flaggedCount: c.flagged_count,
-  }));
-
+export default function HomePage() {
   return (
     <div className={styles.wrap}>
-      <h1>Library</h1>
+      <h1>Read a circuit diagram</h1>
       <p className={styles.intro}>
-        An index of {circuits.length} circuit diagrams, read automatically from hand-drawn
-        images. Every entry is machine-read until a teacher confirms it.
+        Braille Press turns circuit images into plain-language explanations for blind
+        and low-vision students, with a review view for teachers.
       </p>
+      <Link className={styles.primary} href="/try">Try it</Link>
 
-      <section className={styles.startHere} aria-label="Start here">
-        <h2 className={styles.startHereTitle}>
-          <BrailleCell pattern={DIVIDER_PATTERN} /> Start here
-        </h2>
-        <div className={styles.startHereGroup}>
-          <span className="small-caps">Clean examples</span>
-          <ul className={styles.startHereList}>
-            {START_HERE_CLEAN.map((id) => (
-              <li key={id}>
-                <Link href={`/circuit/${id}`}>{id}</Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <span className="small-caps">Several parts flagged</span>
-          <ul className={styles.startHereList}>
-            {START_HERE_FLAGGED.map((id) => (
-              <li key={id}>
-                <Link href={`/circuit/${id}`}>{id}</Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <section className={styles.startHere} aria-labelledby="how-it-works">
+        <h2 id="how-it-works">How it works</h2>
+        <ol className={styles.steps}>
+          <li>Add a circuit image.</li>
+          <li>The machine reads the parts and their connections.</li>
+          <li>A teacher checks the reading and can sign off.</li>
+          <li>
+            The student reads, hears or feels it. Text and read-aloud are available.
+            Braille and raised diagram are <strong>not run</strong>.
+          </li>
+        </ol>
       </section>
-
-      <LibraryList circuits={summaries} />
-
-      <p className={styles.notice}>
-        Status filters that depend on teacher sign-off use this browser&apos;s saved
-        decisions only.
-      </p>
     </div>
   );
 }

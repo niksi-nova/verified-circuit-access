@@ -15,11 +15,13 @@ import styles from "./CircuitClient.module.css";
 
 export function CircuitClient({
   circuit,
-  availableTextLayers,
+  textDownloads,
+  embedded = false,
   verifierNote,
 }: {
   circuit: Circuit;
-  availableTextLayers: string[];
+  textDownloads: Record<string, string>;
+  embedded?: boolean;
   verifierNote: string;
 }) {
   const [mode, setMode] = useState<Mode>("reader");
@@ -55,12 +57,13 @@ export function CircuitClient({
     setShortcutsDisabled(disabled, window.localStorage);
   }
 
+  const Heading = embedded ? "h3" : "h1";
   return (
     <div className={styles.wrap}>
       <div className={styles.head}>
-        <h1>
+        <Heading>
           Circuit {circuit.id} <StatusStamp status={status} />
-        </h1>
+        </Heading>
         <ModeToggle mode={mode} onChange={setMode} />
       </div>
 
@@ -86,7 +89,7 @@ export function CircuitClient({
         <ReviewMode circuit={circuit} />
       )}
 
-      <Downloads circuitId={circuit.id} availableTextLayers={availableTextLayers} />
+      <Downloads textDownloads={textDownloads} />
 
       <p
         style={{

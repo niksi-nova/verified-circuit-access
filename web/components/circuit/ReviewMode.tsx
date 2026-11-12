@@ -50,9 +50,9 @@ export function ReviewMode({ circuit }: { circuit: Circuit }) {
   }
 
   const evaluation = circuit.evaluation;
-  const trueErrorSet = new Set(evaluation.true_error_component_ids);
+  const trueErrorSet = new Set(evaluation?.true_error_component_ids);
   const flaggedSet = new Set(flagged.map((c) => c.id));
-  const missedErrors = evaluation.true_error_component_ids.filter((id) => !flaggedSet.has(id));
+  const missedErrors = evaluation?.true_error_component_ids.filter((id) => !flaggedSet.has(id));
 
   return (
     <div>
@@ -76,6 +76,7 @@ export function ReviewMode({ circuit }: { circuit: Circuit }) {
                 <li
                   key={c.id}
                   className={`${styles.part} ${isFlagged ? styles.flaggedPart : ""}`}
+                  onFocus={() => setHighlightIds([c.id])}
                   onMouseEnter={() => setHighlightIds([c.id])}
                 >
                   {isFlagged && (
@@ -142,7 +143,7 @@ export function ReviewMode({ circuit }: { circuit: Circuit }) {
             </p>
           </div>
 
-          <div className={controlStyles.group} style={{ marginBottom: "var(--space-3)" }}>
+          {evaluation && <div className={controlStyles.group} style={{ marginBottom: "var(--space-3)" }}>
             <label htmlFor="evaluation-toggle">
               Evaluation view (research only) — not available for new circuits
             </label>
@@ -154,9 +155,9 @@ export function ReviewMode({ circuit }: { circuit: Circuit }) {
             >
               <Switch.Thumb className={controlStyles.switchThumb} />
             </Switch.Root>
-          </div>
+          </div>}
 
-          {evaluationVisible && (
+          {evaluation && evaluationVisible && (
             <section className={styles.evaluationPanel} aria-label="Evaluation view">
               <span className={styles.evalLabel}>Evaluation only — ground truth</span>
               <h2>How this circuit actually scored</h2>
@@ -176,7 +177,7 @@ export function ReviewMode({ circuit }: { circuit: Circuit }) {
               </p>
               <p>
                 Real errors that were not flagged (missed):{" "}
-                {missedErrors.join(", ") || "none"}
+                {missedErrors?.join(", ") || "none"}
               </p>
               <p>{evaluation.note}</p>
             </section>

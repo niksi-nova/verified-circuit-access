@@ -38,3 +38,11 @@
   align-items: center;
   gap: var(--space-3);
 }
+
+.engine {
+  border: 1px solid currentColor;
+  border-radius: 0.25rem;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}

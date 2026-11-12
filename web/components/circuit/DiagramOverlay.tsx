@@ -21,7 +21,7 @@ export function DiagramOverlay({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         className={styles.image}
-        src={`/data/images/${circuit.image}`}
+        src={circuit.image_url ?? `/data/images/${circuit.image}`}
         alt={`Original hand-drawn circuit diagram for circuit ${circuit.id}`}
         width={width}
         height={height}
@@ -29,8 +29,7 @@ export function DiagramOverlay({
       <svg
         className={styles.overlay}
         viewBox={`0 0 ${width} ${height}`}
-        role="group"
-        aria-label="Detected component boxes"
+        aria-hidden="true"
       >
         {circuit.components
           .filter((c) => c.bbox)
@@ -47,20 +46,7 @@ export function DiagramOverlay({
                 className={`${styles.box} ${flagged ? styles.flagged : ""} ${
                   isCurrent ? styles.current : ""
                 }`}
-                role={onSelect ? "button" : undefined}
-                tabIndex={onSelect ? 0 : undefined}
-                aria-label={onSelect ? `${c.id}, ${c.category}` : undefined}
                 onClick={onSelect ? () => onSelect(c.id) : undefined}
-                onKeyDown={
-                  onSelect
-                    ? (e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          onSelect(c.id);
-                        }
-                      }
-                    : undefined
-                }
               >
                 <title>{`${c.id} — ${c.category}`}</title>
               </rect>
