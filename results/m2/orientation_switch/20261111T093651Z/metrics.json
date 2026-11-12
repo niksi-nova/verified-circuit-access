@@ -1,0 +1,51 @@
+{
+  "top1": 0.98611,
+  "per_class": {
+    "d": {
+      "support": 18,
+      "recall": 1.0,
+      "precision": 1.0
+    },
+    "l": {
+      "support": 18,
+      "recall": 0.94444,
+      "precision": 1.0
+    },
+    "r": {
+      "support": 18,
+      "recall": 1.0,
+      "precision": 1.0
+    },
+    "u": {
+      "support": 18,
+      "recall": 1.0,
+      "precision": 0.94737
+    }
+  },
+  "confusion_matrix_pred_by_true": [
+    [
+      18.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      17.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      18.0,
+      0.0
+    ],
+    [
+      0.0,
+      1.0,
+      0.0,
+      18.0
+    ]
+  ]
+}

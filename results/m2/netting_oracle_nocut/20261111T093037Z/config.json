@@ -1,0 +1,9 @@
+{
+  "stage": "net extraction, ground-truth boxes, conventional orientation",
+  "manifest": "/kaggle/working/netting_eval/manifest.json",
+  "detect_plain_crossings": false,
+  "ged_timeout_s": 30.0,
+  "orientation": "drawing conventions",
+  "code_commit": "91c5b1e44478a57cbf49996db1d9079bffcd80eb",
+  "python": "3.13.16"
+}

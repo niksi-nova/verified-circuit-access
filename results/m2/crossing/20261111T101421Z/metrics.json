@@ -1,0 +1,27 @@
+{
+  "map50": 0.96841,
+  "map50_95": 0.79529,
+  "precision": 0.94581,
+  "recall": 0.94615,
+  "per_class": {
+    "hop": {
+      "precision": 0.95403,
+      "recall": 0.96875,
+      "ap50": 0.97604,
+      "ap50_95": 0.81557
+    },
+    "dot_junction": {
+      "precision": 0.96751,
+      "recall": 0.94888,
+      "ap50": 0.97703,
+      "ap50_95": 0.82697
+    },
+    "t_junction": {
+      "precision": 0.91587,
+      "recall": 0.9208,
+      "ap50": 0.95218,
+      "ap50_95": 0.74333
+    }
+  },
+  "classes_without_val_instances": []
+}

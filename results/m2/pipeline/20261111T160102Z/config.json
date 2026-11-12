@@ -1,0 +1,53 @@
+{
+  "weights": {
+    "detector": {
+      "path": "D:\\Downloads\\verified-circuit-access\\results\\m2\\detector_i2n_cghd\\20261111T084059Z\\weights\\best.pt",
+      "sha256": "9c389e3e16c6a89882650fe2bd927e2609401d2a3c155e59a9a12f482a2e38be"
+    },
+    "crossings": {
+      "path": "D:\\Downloads\\verified-circuit-access\\results\\m2\\crossing\\20261111T101421Z\\weights\\best.pt",
+      "sha256": "6a63270ed1fca304e8e5bb4b308210b3181dc1ae4f06a97aae6f77547078796c"
+    },
+    "orientation_amp_d": {
+      "path": "D:\\Downloads\\verified-circuit-access\\results\\m2\\orientation_amp_d\\20261111T092001Z\\weights\\best.pt",
+      "sha256": "80f88e590dfda0c2e2a4d52b2b23f668b32fc753e4985fc24ec3da2fdc85fdf7"
+    },
+    "orientation_amp_m": {
+      "path": "D:\\Downloads\\verified-circuit-access\\results\\m2\\orientation_amp_m\\20261111T092409Z\\weights\\best.pt",
+      "sha256": "5ef99fc4111bfef4d79200ba09f41aeada56d5fd6085f347495b8821e95a815e"
+    },
+    "orientation_bjt_d": {
+      "path": "D:\\Downloads\\verified-circuit-access\\results\\m2\\orientation_bjt_d\\20261111T092510Z\\weights\\best.pt",
+      "sha256": "8b63891a400327a12b5ae537f2d19b0b538886c342776a4237acac0f6eab915a"
+    },
+    "orientation_bjt_m": {
+      "path": "D:\\Downloads\\verified-circuit-access\\results\\m2\\orientation_bjt_m\\20261111T093222Z\\weights\\best.pt",
+      "sha256": "0c1a0a8d1ad5cf14da62683ba10686770810e87594712393a50cf30a1b19321a"
+    },
+    "orientation_diode": {
+      "path": "D:\\Downloads\\verified-circuit-access\\results\\m2\\orientation_diode\\20261111T093413Z\\weights\\best.pt",
+      "sha256": "37778c4109dc5b41f35cdc9bdfbe783ef90a0fa82b30a78d0e6e4f187159a91c"
+    },
+    "orientation_mos": {
+      "path": "D:\\Downloads\\verified-circuit-access\\results\\m2\\orientation_mos\\20261111T093527Z\\weights\\best.pt",
+      "sha256": "76380b8908b4ed7cb4c82ae2cd35aeb53c75984e8b0a6980cdcdf70420240309"
+    },
+    "orientation_switch": {
+      "path": "D:\\Downloads\\verified-circuit-access\\results\\m2\\orientation_switch\\20261111T093651Z\\weights\\best.pt",
+      "sha256": "c1b887863065968a53e10cd4616a707c52c745c7f8c1639adc42124ed1b0e14b"
+    },
+    "orientation_voltagelines": {
+      "path": "D:\\Downloads\\verified-circuit-access\\results\\m2\\orientation_voltagelines\\20261111T093732Z\\weights\\best.pt",
+      "sha256": "ff29691426ad09476d9759890049e6afbe30d5306daf9466398c5df2d45c68dd"
+    }
+  },
+  "images": "D:\\Downloads\\verified-circuit-access\\data\\image2net\\images",
+  "circuits": 122,
+  "conf": 0.25,
+  "imgsz": 1024,
+  "device": "cpu",
+  "detect_plain_crossings": true,
+  "ged_timeout_s": 30.0,
+  "code_commit": "accbade7ad571863d27bf45e28c49caaad99aec0\n",
+  "python": "3.11.9"
+}

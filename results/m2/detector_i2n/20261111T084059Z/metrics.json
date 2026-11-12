@@ -1,0 +1,137 @@
+{
+  "map50": 0.92267,
+  "map50_95": 0.7242,
+  "precision": 0.91252,
+  "recall": 0.85638,
+  "per_class": {
+    "nmos": {
+      "precision": 0.96872,
+      "recall": 0.93296,
+      "ap50": 0.97717,
+      "ap50_95": 0.85193
+    },
+    "nmos-bulk": {
+      "precision": 0.76285,
+      "recall": 0.76,
+      "ap50": 0.77785,
+      "ap50_95": 0.65588
+    },
+    "pmos": {
+      "precision": 0.90473,
+      "recall": 0.96504,
+      "ap50": 0.97282,
+      "ap50_95": 0.83739
+    },
+    "pmos-bulk": {
+      "precision": 0.86771,
+      "recall": 0.77778,
+      "ap50": 0.88901,
+      "ap50_95": 0.70461
+    },
+    "npn": {
+      "precision": 0.93982,
+      "recall": 0.90984,
+      "ap50": 0.97003,
+      "ap50_95": 0.79278
+    },
+    "pnp": {
+      "precision": 0.84483,
+      "recall": 0.94042,
+      "ap50": 0.9129,
+      "ap50_95": 0.719
+    },
+    "resistor": {
+      "precision": 0.99039,
+      "recall": 0.99476,
+      "ap50": 0.99387,
+      "ap50_95": 0.81462
+    },
+    "capacitor": {
+      "precision": 0.96298,
+      "recall": 0.98617,
+      "ap50": 0.99145,
+      "ap50_95": 0.78487
+    },
+    "inductor": {
+      "precision": 0.98788,
+      "recall": 0.98734,
+      "ap50": 0.9944,
+      "ap50_95": 0.79426
+    },
+    "diode": {
+      "precision": 0.84887,
+      "recall": 0.83217,
+      "ap50": 0.82208,
+      "ap50_95": 0.5876
+    },
+    "current": {
+      "precision": 0.89593,
+      "recall": 0.92891,
+      "ap50": 0.94283,
+      "ap50_95": 0.82905
+    },
+    "voltage": {
+      "precision": 0.89636,
+      "recall": 0.94693,
+      "ap50": 0.94526,
+      "ap50_95": 0.8402
+    },
+    "voltage-lines": {
+      "precision": 0.85922,
+      "recall": 0.84213,
+      "ap50": 0.88416,
+      "ap50_95": 0.73704
+    },
+    "switch": {
+      "precision": 0.98461,
+      "recall": 0.94167,
+      "ap50": 0.98835,
+      "ap50_95": 0.8071
+    },
+    "single-end-amp": {
+      "precision": 0.98725,
+      "recall": 0.93321,
+      "ap50": 0.96389,
+      "ap50_95": 0.85327
+    },
+    "single-input-single-end-amp": {
+      "precision": 0.89963,
+      "recall": 0.89665,
+      "ap50": 0.95192,
+      "ap50_95": 0.8504
+    },
+    "port": {
+      "precision": 0.84899,
+      "recall": 0.7867,
+      "ap50": 0.83356,
+      "ap50_95": 0.51556
+    },
+    "gnd": {
+      "precision": 0.98217,
+      "recall": 0.96456,
+      "ap50": 0.98479,
+      "ap50_95": 0.75617
+    },
+    "vdd": {
+      "precision": 0.7481,
+      "recall": 0.68293,
+      "ap50": 0.76681,
+      "ap50_95": 0.33019
+    },
+    "cross-line-curved": {
+      "precision": 0.98186,
+      "recall": 0.97382,
+      "ap50": 0.98449,
+      "ap50_95": 0.61629
+    },
+    "antenna": {
+      "precision": 1.0,
+      "recall": 0.0,
+      "ap50": 0.82833,
+      "ap50_95": 0.53
+    }
+  },
+  "classes_without_val_instances": [
+    "diff-amp"
+  ]
+}

@@ -1,0 +1,116 @@
+003.png <-   288.png  d= 7  ned=0.5
+007.png <-  2181.png  d= 0  ned=1.2222222222222223
+011.png <-  2106.png  d= 0  ned=0.9272727272727272
+012.png <-  1822.png  d= 0  ned=0.0
+014.png <-  1887.png  d= 0  ned=0.2857142857142857
+016.png <-  1877.png  d= 0  ned=0.5957446808510638
+018.png <-  2145.png  d= 0  ned=1.2531645569620253
+019.png <-  2026.png  d= 0  ned=0.8305084745762712
+028.png <-  1876.png  d= 0  ned=0.38461538461538464
+029.png <-  2097.png  d= 0  ned=1.3014705882352942
+036.png <-  1927.png  d= 0  ned=0.9821428571428571
+039.png <-  1769.png  d= 0  ned=1.2155172413793103
+041.png <-  1853.png  d= 0  ned=0.36363636363636365
+043.png <-  1768.png  d= 0  ned=0.4634146341463415
+049.png <-  1889.png  d= 1  ned=0.9558823529411765
+052.png <-  1885.png  d= 7  ned=1.2210526315789474
+063.png <-  1815.png  d= 3  ned=1.0721649484536082
+066.png <-   116.png  d= 9  ned=1.0227272727272727
+067.png <-  1861.png  d= 9  ned=0.7592592592592593
+068.png <-  1891.png  d= 4  ned=0.23076923076923078
+076.png <-  2064.png  d= 9  ned=0.5909090909090909
+079.png <-  1999.png  d= 2  ned=0.23076923076923078
+082.png <-  1866.png  d= 4  ned=0.0
+090.png <-  1761.png  d= 5  ned=0.2
+092.png <-  1762.png  d= 2  ned=1.0476190476190477
+096.png <-  1834.png  d= 7  ned=0.14285714285714285
+100.png <-  1933.png  d= 0  ned=0.45454545454545453
+101.png <-  1741.png  d= 8  ned=0.0
+103.png <-  1869.png  d= 4  ned=1.188034188034188
+104.png <-  1764.png  d= 2  ned=1.1123595505617978
+105.png <-  1763.png  d= 2  ned=0.9583333333333334
+108.png <-  1873.png  d= 8  ned=0.8727272727272727
+110.png <-  1934.png  d= 5  ned=0.3939393939393939
+112.png <-  2006.png  d= 4  ned=0.5
+113.png <-   774.png  d= 1  ned=1.144927536231884
+120.png <-  2005.png  d= 6  ned=0.631578947368421
+121.png <-  1766.png  d= 8  ned=1.0136986301369864
+{
+  "all": {
+    "circuits": 37,
+    "macro_ned": 0.70458,
+    "ned_exact_fraction": 0.18919,
+    "graph_isomorphism_accuracy": 0.08108,
+    "macro_connection_precision": 0.20939,
+    "macro_connection_recall": 0.24832,
+    "component_count_match": 1.0
+  },
+  "exact_copies": {
+    "circuits": 14,
+    "macro_ned": 0.73428,
+    "ned_exact_fraction": 0.07143,
+    "graph_isomorphism_accuracy": 0.07143,
+    "macro_connection_precision": 0.14678,
+    "macro_connection_recall": 0.1755,
+    "component_count_match": 1.0
+  }
+}
+wrote /kaggle/working/results/m2/netting_oracle_cut/20261111T092530Z
+003.png <-   288.png  d= 7  ned=0.5
+007.png <-  2181.png  d= 0  ned=1.0740740740740742
+011.png <-  2106.png  d= 0  ned=0.9272727272727272
+012.png <-  1822.png  d= 0  ned=0.0
+014.png <-  1887.png  d= 0  ned=0.2857142857142857
+016.png <-  1877.png  d= 0  ned=0.5957446808510638
+018.png <-  2145.png  d= 0  ned=1.2278481012658229
+019.png <-  2026.png  d= 0  ned=0.8983050847457628
+028.png <-  1876.png  d= 0  ned=0.19230769230769232
+029.png <-  2097.png  d= 0  ned=1.2647058823529411
+036.png <-  1927.png  d= 0  ned=1.0357142857142858
+039.png <-  1769.png  d= 0  ned=1.0775862068965518
+041.png <-  1853.png  d= 0  ned=0.30303030303030304
+043.png <-  1768.png  d= 0  ned=0.2926829268292683
+049.png <-  1889.png  d= 1  ned=0.9852941176470589
+052.png <-  1885.png  d= 7  ned=1.2
+063.png <-  1815.png  d= 3  ned=1.0206185567010309
+066.png <-   116.png  d= 9  ned=0.9772727272727273
+067.png <-  1861.png  d= 9  ned=0.7592592592592593
+068.png <-  1891.png  d= 4  ned=0.23076923076923078
+076.png <-  2064.png  d= 9  ned=0.5681818181818182
+079.png <-  1999.png  d= 2  ned=0.11538461538461539
+082.png <-  1866.png  d= 4  ned=0.0
+090.png <-  1761.png  d= 5  ned=0.2
+092.png <-  1762.png  d= 2  ned=1.0476190476190477
+096.png <-  1834.png  d= 7  ned=0.14285714285714285
+100.png <-  1933.png  d= 0  ned=0.45454545454545453
+101.png <-  1741.png  d= 8  ned=0.0
+103.png <-  1869.png  d= 4  ned=1.1111111111111112
+104.png <-  1764.png  d= 2  ned=1.1348314606741574
+105.png <-  1763.png  d= 2  ned=0.9722222222222222
+108.png <-  1873.png  d= 8  ned=0.8545454545454545
+110.png <-  1934.png  d= 5  ned=0.3939393939393939
+112.png <-  2006.png  d= 4  ned=0.5
+113.png <-   774.png  d= 1  ned=1.0869565217391304
+120.png <-  2005.png  d= 6  ned=0.6842105263157895
+121.png <-  1766.png  d= 8  ned=1.0410958904109588
+{
+  "all": {
+    "circuits": 37,
+    "macro_ned": 0.67988,
+    "ned_exact_fraction": 0.21622,
+    "graph_isomorphism_accuracy": 0.08108,
+    "macro_connection_precision": 0.22257,
+    "macro_connection_recall": 0.25823,
+    "component_count_match": 1.0
+  },
+  "exact_copies": {
+    "circuits": 14,
+    "macro_ned": 0.68782,
+    "ned_exact_fraction": 0.14286,
+    "graph_isomorphism_accuracy": 0.07143,
+    "macro_connection_precision": 0.17198,
+    "macro_connection_recall": 0.20169,
+    "component_count_match": 1.0
+  }
+}
+wrote /kaggle/working/results/m2/netting_oracle_nocut/20261111T093037Z

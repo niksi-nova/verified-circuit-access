@@ -1,0 +1,25 @@
+{
+  "top1": 0.98469,
+  "per_class": {
+    "0": {
+      "support": 98,
+      "recall": 0.9898,
+      "precision": 0.9798
+    },
+    "1": {
+      "support": 98,
+      "recall": 0.97959,
+      "precision": 0.98969
+    }
+  },
+  "confusion_matrix_pred_by_true": [
+    [
+      97.0,
+      2.0
+    ],
+    [
+      1.0,
+      96.0
+    ]
+  ]
+}

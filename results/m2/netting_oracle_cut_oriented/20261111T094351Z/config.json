@@ -1,0 +1,18 @@
+{
+  "stage": "net extraction, ground-truth boxes, conventional orientation",
+  "manifest": "/kaggle/working/netting_eval/manifest.json",
+  "detect_plain_crossings": true,
+  "ged_timeout_s": 30.0,
+  "orientation": {
+    "amp_d": "/kaggle/working/results/m2/orientation_amp_d/20261111T092001Z/weights/best.pt",
+    "amp_m": "/kaggle/working/results/m2/orientation_amp_m/20261111T092409Z/weights/best.pt",
+    "bjt_d": "/kaggle/working/results/m2/orientation_bjt_d/20261111T092510Z/weights/best.pt",
+    "bjt_m": "/kaggle/working/results/m2/orientation_bjt_m/20261111T093222Z/weights/best.pt",
+    "diode": "/kaggle/working/results/m2/orientation_diode/20261111T093413Z/weights/best.pt",
+    "mos": "/kaggle/working/results/m2/orientation_mos/20261111T093527Z/weights/best.pt",
+    "switch": "/kaggle/working/results/m2/orientation_switch/20261111T093651Z/weights/best.pt",
+    "voltagelines": "/kaggle/working/results/m2/orientation_voltagelines/20261111T093732Z/weights/best.pt"
+  },
+  "code_commit": "91c5b1e44478a57cbf49996db1d9079bffcd80eb",
+  "python": "3.13.16"
+}

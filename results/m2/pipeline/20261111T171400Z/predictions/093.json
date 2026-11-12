@@ -1,0 +1,884 @@
+{
+ "image": "093.png",
+ "netlist": {
+  "schema_version": "1.0.0",
+  "components": [
+   {
+    "id": "C1",
+    "canonical_category": "nmos",
+    "terminals": [
+     {
+      "name": "Gate"
+     },
+     {
+      "name": "Drain"
+     },
+     {
+      "name": "Source"
+     }
+    ],
+    "bbox": {
+     "x": 420.1430969238281,
+     "y": 385.44146728515625,
+     "width": 38.64404296875,
+     "height": 64.95751953125
+    }
+   },
+   {
+    "id": "C2",
+    "canonical_category": "pmos",
+    "terminals": [
+     {
+      "name": "Gate"
+     },
+     {
+      "name": "Source"
+     },
+     {
+      "name": "Drain"
+     }
+    ],
+    "bbox": {
+     "x": 83.16767120361328,
+     "y": 75.70181274414062,
+     "width": 37.86602020263672,
+     "height": 63.51374816894531
+    }
+   },
+   {
+    "id": "C3",
+    "canonical_category": "nmos",
+    "terminals": [
+     {
+      "name": "Gate"
+     },
+     {
+      "name": "Drain"
+     },
+     {
+      "name": "Source"
+     }
+    ],
+    "bbox": {
+     "x": 242.97113037109375,
+     "y": 386.02191162109375,
+     "width": 37.764862060546875,
+     "height": 63.731475830078125
+    }
+   },
+   {
+    "id": "C4",
+    "canonical_category": "pmos",
+    "terminals": [
+     {
+      "name": "Gate"
+     },
+     {
+      "name": "Source"
+     },
+     {
+      "name": "Drain"
+     }
+    ],
+    "bbox": {
+     "x": 449.0553894042969,
+     "y": 239.6959686279297,
+     "width": 38.36151123046875,
+     "height": 62.71089172363281
+    }
+   },
+   {
+    "id": "C5",
+    "canonical_category": "pmos",
+    "terminals": [
+     {
+      "name": "Gate"
+     },
+     {
+      "name": "Source"
+     },
+     {
+      "name": "Drain"
+     }
+    ],
+    "bbox": {
+     "x": 213.67984008789062,
+     "y": 239.8076171875,
+     "width": 38.21270751953125,
+     "height": 62.547882080078125
+    }
+   },
+   {
+    "id": "C6",
+    "canonical_category": "pmos",
+    "terminals": [
+     {
+      "name": "Gate"
+     },
+     {
+      "name": "Source"
+     },
+     {
+      "name": "Drain"
+     }
+    ],
+    "bbox": {
+     "x": 604.679931640625,
+     "y": 324.25091552734375,
+     "width": 38.906982421875,
+     "height": 64.26971435546875
+    }
+   },
+   {
+    "id": "C7",
+    "canonical_category": "pmos",
+    "terminals": [
+     {
+      "name": "Gate"
+     },
+     {
+      "name": "Source"
+     },
+     {
+      "name": "Drain"
+     }
+    ],
+    "bbox": {
+     "x": 336.2251892089844,
+     "y": 76.53131103515625,
+     "width": 39.4373779296875,
+     "height": 62.68963623046875
+    }
+   },
+   {
+    "id": "C8",
+    "canonical_category": "pmos",
+    "terminals": [
+     {
+      "name": "Gate"
+     },
+     {
+      "name": "Source"
+     },
+     {
+      "name": "Drain"
+     }
+    ],
+    "bbox": {
+     "x": 604.6550903320312,
+     "y": 75.58858489990234,
+     "width": 39.58001708984375,
+     "height": 63.98389434814453
+    }
+   },
+   {
+    "id": "C9",
+    "canonical_category": "nmos",
+    "terminals": [
+     {
+      "name": "Gate"
+     },
+     {
+      "name": "Drain"
+     },
+     {
+      "name": "Source"
+     }
+    ],
+    "bbox": {
+     "x": 82.75355529785156,
+     "y": 384.7464904785156,
+     "width": 39.045677185058594,
+     "height": 63.153839111328125
+    }
+   },
+   {
+    "id": "C10",
+    "canonical_category": "capacitor",
+    "terminals": [
+     {
+      "name": "Pos"
+     },
+     {
+      "name": "Neg"
+     }
+    ],
+    "bbox": {
+     "x": 522.7037963867188,
+     "y": 308.28277587890625,
+     "width": 47.44854736328125,
+     "height": 23.04107666015625
+    }
+   },
+   {
+    "id": "C11",
+    "canonical_category": "resistor",
+    "terminals": [
+     {
+      "name": "Pos"
+     },
+     {
+      "name": "Neg"
+     }
+    ],
+    "bbox": {
+     "x": 75.37004852294922,
+     "y": 224.13235473632812,
+     "width": 26.47376251220703,
+     "height": 81.40725708007812
+    }
+   }
+  ],
+  "nets": [
+   {
+    "name": "net1",
+    "endpoints": [
+     {
+      "component_id": "C1",
+      "terminal_name": "Drain"
+     },
+     {
+      "component_id": "C4",
+      "terminal_name": "Drain"
+     },
+     {
+      "component_id": "C6",
+      "terminal_name": "Gate"
+     },
+     {
+      "component_id": "C10",
+      "terminal_name": "Pos"
+     }
+    ]
+   },
+   {
+    "name": "net2",
+    "endpoints": [
+     {
+      "component_id": "C1",
+      "terminal_name": "Gate"
+     },
+     {
+      "component_id": "C3",
+      "terminal_name": "Drain"
+     },
+     {
+      "component_id": "C3",
+      "terminal_name": "Gate"
+     },
+     {
+      "component_id": "C5",
+      "terminal_name": "Drain"
+     }
+    ]
+   },
+   {
+    "name": "GND",
+    "endpoints": [
+     {
+      "component_id": "C1",
+      "terminal_name": "Source"
+     },
+     {
+      "component_id": "C3",
+      "terminal_name": "Source"
+     },
+     {
+      "component_id": "C6",
+      "terminal_name": "Drain"
+     },
+     {
+      "component_id": "C9",
+      "terminal_name": "Source"
+     }
+    ]
+   },
+   {
+    "name": "VDD",
+    "endpoints": [
+     {
+      "component_id": "C2",
+      "terminal_name": "Source"
+     },
+     {
+      "component_id": "C7",
+      "terminal_name": "Source"
+     },
+     {
+      "component_id": "C8",
+      "terminal_name": "Source"
+     }
+    ]
+   },
+   {
+    "name": "net4",
+    "endpoints": [
+     {
+      "component_id": "C2",
+      "terminal_name": "Gate"
+     },
+     {
+      "component_id": "C2",
+      "terminal_name": "Drain"
+     },
+     {
+      "component_id": "C7",
+      "terminal_name": "Gate"
+     },
+     {
+      "component_id": "C8",
+      "terminal_name": "Gate"
+     },
+     {
+      "component_id": "C11",
+      "terminal_name": "Neg"
+     }
+    ]
+   },
+   {
+    "name": "net8",
+    "endpoints": [
+     {
+      "component_id": "C4",
+      "terminal_name": "Source"
+     },
+     {
+      "component_id": "C5",
+      "terminal_name": "Source"
+     },
+     {
+      "component_id": "C7",
+      "terminal_name": "Drain"
+     }
+    ]
+   },
+   {
+    "name": "net9",
+    "endpoints": [
+     {
+      "component_id": "C4",
+      "terminal_name": "Gate"
+     }
+    ]
+   },
+   {
+    "name": "net13",
+    "endpoints": [
+     {
+      "component_id": "C5",
+      "terminal_name": "Gate"
+     }
+    ]
+   },
+   {
+    "name": "net14",
+    "endpoints": [
+     {
+      "component_id": "C6",
+      "terminal_name": "Source"
+     },
+     {
+      "component_id": "C8",
+      "terminal_name": "Drain"
+     },
+     {
+      "component_id": "C10",
+      "terminal_name": "Neg"
+     }
+    ]
+   },
+   {
+    "name": "net18",
+    "endpoints": [
+     {
+      "component_id": "C9",
+      "terminal_name": "Drain"
+     },
+     {
+      "component_id": "C9",
+      "terminal_name": "Gate"
+     },
+     {
+      "component_id": "C11",
+      "terminal_name": "Pos"
+     }
+    ]
+   }
+  ]
+ },
+ "components": [
+  {
+   "component_id": "C1",
+   "detector_class": "nmos",
+   "category": "nmos",
+   "detector_score": 0.9317181706428528,
+   "box_area": 2510.2211759090424,
+   "box_aspect": 0.5949125404974706,
+   "orientation": "l",
+   "orientation_source": "predicted",
+   "orientation_p": 0.9999997615814209,
+   "mirror_source": "convention",
+   "mirrored_p": null,
+   "terminals": 3,
+   "unconnected_terminals": 0,
+   "extra_contacts": 1,
+   "max_terminal_distance": 0.3014,
+   "mean_terminal_distance": 0.24033333333333332,
+   "min_net_fanout": 4,
+   "rules": [
+    "extra_contacts"
+   ]
+  },
+  {
+   "component_id": "C2",
+   "detector_class": "pmos",
+   "category": "pmos",
+   "detector_score": 0.9271501302719116,
+   "box_area": 2405.012871310464,
+   "box_aspect": 0.596186200535888,
+   "orientation": "r",
+   "orientation_source": "predicted",
+   "orientation_p": 1.0,
+   "mirror_source": "convention",
+   "mirrored_p": null,
+   "terminals": 3,
+   "unconnected_terminals": 0,
+   "extra_contacts": 1,
+   "max_terminal_distance": 0.3028,
+   "mean_terminal_distance": 0.22886666666666666,
+   "min_net_fanout": 3,
+   "rules": [
+    "extra_contacts"
+   ]
+  },
+  {
+   "component_id": "C3",
+   "detector_class": "nmos",
+   "category": "nmos",
+   "detector_score": 0.9243494272232056,
+   "box_area": 2406.8103936379775,
+   "box_aspect": 0.5925621769882774,
+   "orientation": "r",
+   "orientation_source": "predicted",
+   "orientation_p": 1.0,
+   "mirror_source": "convention",
+   "mirrored_p": null,
+   "terminals": 3,
+   "unconnected_terminals": 0,
+   "extra_contacts": 2,
+   "max_terminal_distance": 0.2851,
+   "mean_terminal_distance": 0.22293333333333334,
+   "min_net_fanout": 4,
+   "rules": [
+    "extra_contacts"
+   ]
+  },
+  {
+   "component_id": "C4",
+   "detector_class": "pmos",
+   "category": "pmos",
+   "detector_score": 0.9235019683837891,
+   "box_area": 2405.68457712885,
+   "box_aspect": 0.6117200724800423,
+   "orientation": "r",
+   "orientation_source": "predicted",
+   "orientation_p": 1.0,
+   "mirror_source": "convention",
+   "mirrored_p": null,
+   "terminals": 3,
+   "unconnected_terminals": 0,
+   "extra_contacts": 3,
+   "max_terminal_distance": 0.2264,
+   "mean_terminal_distance": 0.18586666666666665,
+   "min_net_fanout": 1,
+   "rules": [
+    "floating_terminal",
+    "extra_contacts"
+   ]
+  },
+  {
+   "component_id": "C5",
+   "detector_class": "pmos",
+   "category": "pmos",
+   "detector_score": 0.9227697253227234,
+   "box_area": 2390.1239238921553,
+   "box_aspect": 0.61093527468458,
+   "orientation": "l",
+   "orientation_source": "predicted",
+   "orientation_p": 1.0,
+   "mirror_source": "convention",
+   "mirrored_p": null,
+   "terminals": 3,
+   "unconnected_terminals": 0,
+   "extra_contacts": 0,
+   "max_terminal_distance": 1.2341,
+   "mean_terminal_distance": 0.5627666666666667,
+   "min_net_fanout": 1,
+   "rules": [
+    "floating_terminal"
+   ]
+  },
+  {
+   "component_id": "C6",
+   "detector_class": "pmos",
+   "category": "pmos",
+   "detector_score": 0.9176092147827148,
+   "box_area": 2500.54064668715,
+   "box_aspect": 0.6053703958708256,
+   "orientation": "l",
+   "orientation_source": "predicted",
+   "orientation_p": 1.0,
+   "mirror_source": "convention",
+   "mirrored_p": null,
+   "terminals": 3,
+   "unconnected_terminals": 0,
+   "extra_contacts": 1,
+   "max_terminal_distance": 0.3131,
+   "mean_terminal_distance": 0.25453333333333333,
+   "min_net_fanout": 3,
+   "rules": [
+    "extra_contacts"
+   ]
+  },
+  {
+   "component_id": "C7",
+   "detector_class": "pmos",
+   "category": "pmos",
+   "detector_score": 0.9167949557304382,
+   "box_area": 2472.314876295626,
+   "box_aspect": 0.629089276969196,
+   "orientation": "r",
+   "orientation_source": "predicted",
+   "orientation_p": 1.0,
+   "mirror_source": "convention",
+   "mirrored_p": null,
+   "terminals": 3,
+   "unconnected_terminals": 0,
+   "extra_contacts": 1,
+   "max_terminal_distance": 0.2748,
+   "mean_terminal_distance": 0.2182666666666667,
+   "min_net_fanout": 3,
+   "rules": [
+    "extra_contacts"
+   ]
+  },
+  {
+   "component_id": "C8",
+   "detector_class": "pmos",
+   "category": "pmos",
+   "detector_score": 0.9134829640388489,
+   "box_area": 2532.4836317743175,
+   "box_aspect": 0.6185934365683312,
+   "orientation": "l",
+   "orientation_source": "predicted",
+   "orientation_p": 1.0,
+   "mirror_source": "convention",
+   "mirrored_p": null,
+   "terminals": 3,
+   "unconnected_terminals": 0,
+   "extra_contacts": 1,
+   "max_terminal_distance": 0.3072,
+   "mean_terminal_distance": 0.23946666666666663,
+   "min_net_fanout": 3,
+   "rules": [
+    "extra_contacts"
+   ]
+  },
+  {
+   "component_id": "C9",
+   "detector_class": "nmos",
+   "category": "nmos",
+   "detector_score": 0.9129185676574707,
+   "box_area": 2465.8844149380457,
+   "box_aspect": 0.6182629232757891,
+   "orientation": "r",
+   "orientation_source": "predicted",
+   "orientation_p": 1.0,
+   "mirror_source": "convention",
+   "mirrored_p": null,
+   "terminals": 3,
+   "unconnected_terminals": 0,
+   "extra_contacts": 1,
+   "max_terminal_distance": 0.2713,
+   "mean_terminal_distance": 0.22956666666666667,
+   "min_net_fanout": 3,
+   "rules": [
+    "extra_contacts"
+   ]
+  },
+  {
+   "component_id": "C10",
+   "detector_class": "capacitor",
+   "category": "capacitor",
+   "detector_score": 0.9068046808242798,
+   "box_area": 1093.265617210418,
+   "box_aspect": 2.0593025257943602,
+   "orientation": "d",
+   "orientation_source": "contacts",
+   "orientation_p": null,
+   "mirror_source": "n/a",
+   "mirrored_p": null,
+   "terminals": 2,
+   "unconnected_terminals": 0,
+   "extra_contacts": 1,
+   "max_terminal_distance": 0.5115,
+   "mean_terminal_distance": 0.49934999999999996,
+   "min_net_fanout": 3,
+   "rules": [
+    "extra_contacts"
+   ]
+  },
+  {
+   "component_id": "C11",
+   "detector_class": "resistor",
+   "category": "resistor",
+   "detector_score": 0.9000925421714783,
+   "box_area": 2155.1563907081727,
+   "box_aspect": 0.3252015048998089,
+   "orientation": "d",
+   "orientation_source": "contacts",
+   "orientation_p": null,
+   "mirror_source": "n/a",
+   "mirrored_p": null,
+   "terminals": 2,
+   "unconnected_terminals": 0,
+   "extra_contacts": 2,
+   "max_terminal_distance": 0.1447,
+   "mean_terminal_distance": 0.14284999999999998,
+   "min_net_fanout": 3,
+   "rules": [
+    "extra_contacts"
+   ]
+  }
+ ],
+ "rules": {
+  "unconnected_terminal": 0,
+  "floating_terminal": 2,
+  "shorted_two_terminal": 0,
+  "shorted_source": 0,
+  "drain_source_short": 0,
+  "collector_emitter_short": 0,
+  "extra_contacts": 10,
+  "no_ground": 0,
+  "no_supply": 0,
+  "rail_conflict": 0,
+  "isolated_component": 0
+ },
+ "crossings": [
+  {
+   "kind": "dot_junction",
+   "box": [
+    440.3751220703125,
+    342.8618469238281,
+    464.688720703125,
+    367.3228454589844
+   ],
+   "score": 0.9339995980262756
+  },
+  {
+   "kind": "dot_junction",
+   "box": [
+    626.0960693359375,
+    191.93002319335938,
+    649.9163818359375,
+    216.18212890625
+   ],
+   "score": 0.9328030943870544
+  },
+  {
+   "kind": "dot_junction",
+   "box": [
+    74.95318603515625,
+    161.213134765625,
+    99.39302062988281,
+    186.1549072265625
+   ],
+   "score": 0.9326254725456238
+  },
+  {
+   "kind": "dot_junction",
+   "box": [
+    234.36102294921875,
+    343.3605651855469,
+    257.9008483886719,
+    367.4313049316406
+   ],
+   "score": 0.9302632808685303
+  },
+  {
+   "kind": "dot_junction",
+   "box": [
+    74.81065368652344,
+    334.16070556640625,
+    99.2020263671875,
+    359.23602294921875
+   ],
+   "score": 0.9271315336227417
+  },
+  {
+   "kind": "dot_junction",
+   "box": [
+    148.59910583496094,
+    95.51950073242188,
+    171.5247039794922,
+    118.44087219238281
+   ],
+   "score": 0.9265177249908447
+  },
+  {
+   "kind": "dot_junction",
+   "box": [
+    626.998046875,
+    273.1444091796875,
+    650.4342041015625,
+    295.87908935546875
+   ],
+   "score": 0.9247891306877136
+  },
+  {
+   "kind": "dot_junction",
+   "box": [
+    533.6806030273438,
+    342.4783935546875,
+    556.9890747070312,
+    365.86846923828125
+   ],
+   "score": 0.9247173070907593
+  },
+  {
+   "kind": "dot_junction",
+   "box": [
+    329.23406982421875,
+    150.30650329589844,
+    352.72198486328125,
+    173.93528747558594
+   ],
+   "score": 0.9245449304580688
+  },
+  {
+   "kind": "dot_junction",
+   "box": [
+    342.14166259765625,
+    403.93572998046875,
+    364.680908203125,
+    426.6568603515625
+   ],
+   "score": 0.9210752248764038
+  },
+  {
+   "kind": "t_junction",
+   "box": [
+    626.5648803710938,
+    460.5670471191406,
+    647.7680053710938,
+    482.8876037597656
+   ],
+   "score": 0.9077532887458801
+  },
+  {
+   "kind": "t_junction",
+   "box": [
+    442.4839172363281,
+    461.6629638671875,
+    462.4861145019531,
+    482.32574462890625
+   ],
+   "score": 0.8976039290428162
+  },
+  {
+   "kind": "t_junction",
+   "box": [
+    236.55604553222656,
+    461.91748046875,
+    255.56797790527344,
+    482.0931396484375
+   ],
+   "score": 0.8960188031196594
+  },
+  {
+   "kind": "t_junction",
+   "box": [
+    76.00627899169922,
+    460.94921875,
+    96.64746856689453,
+    482.58306884765625
+   ],
+   "score": 0.8959933519363403
+  },
+  {
+   "kind": "t_junction",
+   "box": [
+    628.8060913085938,
+    38.30992126464844,
+    646.7962036132812,
+    56.3516845703125
+   ],
+   "score": 0.8866114020347595
+  },
+  {
+   "kind": "t_junction",
+   "box": [
+    77.69100952148438,
+    38.170433044433594,
+    96.00654602050781,
+    56.44549560546875
+   ],
+   "score": 0.8834893107414246
+  },
+  {
+   "kind": "t_junction",
+   "box": [
+    330.1257629394531,
+    37.831382751464844,
+    349.3029479980469,
+    56.66612243652344
+   ],
+   "score": 0.8802540302276611
+  }
+ ],
+ "crossings_cut": 0,
+ "line_width": 4.0,
+ "score": {
+  "circuit_id": "093",
+  "ned": 0.0,
+  "ned_lower_bound": 0.0,
+  "ned_exact": true,
+  "graph_isomorphism": true,
+  "connection_precision": 1.0,
+  "connection_recall": 1.0,
+  "components_true": 11,
+  "components_pred": 11,
+  "alignment": {
+   "ged": 0.0,
+   "exact": true,
+   "isomorphic": true,
+   "component_map": {
+    "C4": "C1",
+    "C6": "C2",
+    "C1": "C9",
+    "C10": "C11",
+    "C7": "C4",
+    "C5": "C6",
+    "C3": "C7",
+    "C9": "C8",
+    "C8": "C3",
+    "C2": "C5",
+    "C11": "C10"
+   },
+   "net_map": {
+    "net1": "net22",
+    "net9": "INP",
+    "net8": "net12",
+    "GND": "GND",
+    "net14": "OUT",
+    "net4": "net9",
+    "VDD": "VCC",
+    "net2": "net11",
+    "net13": "INN",
+    "net18": "net7"
+   },
+   "lower_bound": 0.0
+  },
+  "errors": []
+ }
+}

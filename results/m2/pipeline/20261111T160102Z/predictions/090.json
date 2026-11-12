@@ -1,0 +1,400 @@
+{
+ "image": "090.png",
+ "netlist": {
+  "schema_version": "1.0.0",
+  "components": [
+   {
+    "id": "C1",
+    "canonical_category": "diff-amp",
+    "terminals": [
+     {
+      "name": "Out"
+     },
+     {
+      "name": "InP"
+     },
+     {
+      "name": "InN"
+     }
+    ],
+    "bbox": {
+     "x": 72.001708984375,
+     "y": 151.91600036621094,
+     "width": 77.58651733398438,
+     "height": 85.19392395019531
+    }
+   },
+   {
+    "id": "C2",
+    "canonical_category": "current",
+    "terminals": [
+     {
+      "name": "Out"
+     },
+     {
+      "name": "In"
+     }
+    ],
+    "bbox": {
+     "x": 216.05255126953125,
+     "y": 67.6689453125,
+     "width": 42.807220458984375,
+     "height": 41.84850311279297
+    }
+   },
+   {
+    "id": "C3",
+    "canonical_category": "nmos",
+    "terminals": [
+     {
+      "name": "Gate"
+     },
+     {
+      "name": "Drain"
+     },
+     {
+      "name": "Source"
+     }
+    ],
+    "bbox": {
+     "x": 197.4248809814453,
+     "y": 307.8084716796875,
+     "width": 44.26023864746094,
+     "height": 58.4515380859375
+    }
+   },
+   {
+    "id": "C4",
+    "canonical_category": "capacitor",
+    "terminals": [
+     {
+      "name": "Pos"
+     },
+     {
+      "name": "Neg"
+     }
+    ],
+    "bbox": {
+     "x": 317.3622741699219,
+     "y": 252.71926879882812,
+     "width": 54.43414306640625,
+     "height": 26.7261962890625
+    }
+   },
+   {
+    "id": "C5",
+    "canonical_category": "nmos",
+    "terminals": [
+     {
+      "name": "Gate"
+     },
+     {
+      "name": "Drain"
+     },
+     {
+      "name": "Source"
+     }
+    ],
+    "bbox": {
+     "x": 197.47679138183594,
+     "y": 165.4413299560547,
+     "width": 44.23976135253906,
+     "height": 58.67597961425781
+    }
+   }
+  ],
+  "nets": [
+   {
+    "name": "net1",
+    "endpoints": [
+     {
+      "component_id": "C1",
+      "terminal_name": "InP"
+     }
+    ]
+   },
+   {
+    "name": "net2",
+    "endpoints": [
+     {
+      "component_id": "C1",
+      "terminal_name": "Out"
+     },
+     {
+      "component_id": "C5",
+      "terminal_name": "Gate"
+     }
+    ]
+   },
+   {
+    "name": "net3",
+    "endpoints": [
+     {
+      "component_id": "C1",
+      "terminal_name": "InN"
+     },
+     {
+      "component_id": "C3",
+      "terminal_name": "Drain"
+     },
+     {
+      "component_id": "C5",
+      "terminal_name": "Source"
+     }
+    ]
+   },
+   {
+    "name": "VDD",
+    "endpoints": [
+     {
+      "component_id": "C2",
+      "terminal_name": "In"
+     }
+    ]
+   },
+   {
+    "name": "net4",
+    "endpoints": [
+     {
+      "component_id": "C2",
+      "terminal_name": "Out"
+     },
+     {
+      "component_id": "C5",
+      "terminal_name": "Drain"
+     }
+    ]
+   },
+   {
+    "name": "net5",
+    "endpoints": [
+     {
+      "component_id": "C3",
+      "terminal_name": "Gate"
+     }
+    ]
+   },
+   {
+    "name": "GND",
+    "endpoints": [
+     {
+      "component_id": "C3",
+      "terminal_name": "Source"
+     },
+     {
+      "component_id": "C4",
+      "terminal_name": "Pos"
+     }
+    ]
+   },
+   {
+    "name": "net7",
+    "endpoints": [
+     {
+      "component_id": "C4",
+      "terminal_name": "Neg"
+     }
+    ]
+   }
+  ]
+ },
+ "components": [
+  {
+   "component_id": "C1",
+   "detector_class": "single-end-amp",
+   "category": "diff-amp",
+   "detector_score": 0.9344474077224731,
+   "box_area": 6609.899857311975,
+   "box_aspect": 0.9107048218525742,
+   "orientation": "r",
+   "orientation_source": "predicted",
+   "orientation_p": 1.0,
+   "mirror_source": "predicted",
+   "mirrored_p": 0.9974797368049622,
+   "terminals": 3,
+   "unconnected_terminals": 0,
+   "extra_contacts": 0,
+   "max_terminal_distance": 0.0862,
+   "mean_terminal_distance": 0.08246666666666667,
+   "min_net_fanout": 1,
+   "rules": [
+    "floating_terminal"
+   ]
+  },
+  {
+   "component_id": "C2",
+   "detector_class": "current",
+   "category": "current",
+   "detector_score": 0.9046544432640076,
+   "box_area": 1791.4180986278225,
+   "box_aspect": 1.022909238679515,
+   "orientation": "d",
+   "orientation_source": "default",
+   "orientation_p": null,
+   "mirror_source": "n/a",
+   "mirrored_p": null,
+   "terminals": 2,
+   "unconnected_terminals": 0,
+   "extra_contacts": 0,
+   "max_terminal_distance": 0.1728,
+   "mean_terminal_distance": 0.15875,
+   "min_net_fanout": 1,
+   "rules": []
+  },
+  {
+   "component_id": "C3",
+   "detector_class": "nmos",
+   "category": "nmos",
+   "detector_score": 0.8985825777053833,
+   "box_area": 2587.079024994746,
+   "box_aspect": 0.7572125575615818,
+   "orientation": "l",
+   "orientation_source": "predicted",
+   "orientation_p": 1.0,
+   "mirror_source": "convention",
+   "mirrored_p": null,
+   "terminals": 3,
+   "unconnected_terminals": 0,
+   "extra_contacts": 1,
+   "max_terminal_distance": 0.1713,
+   "mean_terminal_distance": 0.1594,
+   "min_net_fanout": 1,
+   "rules": [
+    "floating_terminal",
+    "extra_contacts"
+   ]
+  },
+  {
+   "component_id": "C4",
+   "detector_class": "capacitor",
+   "category": "capacitor",
+   "detector_score": 0.8980129957199097,
+   "box_area": 1454.817592419684,
+   "box_aspect": 2.036733640569834,
+   "orientation": "l",
+   "orientation_source": "box_shape",
+   "orientation_p": null,
+   "mirror_source": "n/a",
+   "mirrored_p": null,
+   "terminals": 2,
+   "unconnected_terminals": 0,
+   "extra_contacts": 2,
+   "max_terminal_distance": 0.8811,
+   "mean_terminal_distance": 0.8338,
+   "min_net_fanout": 1,
+   "rules": [
+    "floating_terminal",
+    "extra_contacts"
+   ]
+  },
+  {
+   "component_id": "C5",
+   "detector_class": "nmos",
+   "category": "nmos",
+   "detector_score": 0.8966623544692993,
+   "box_area": 2595.8113352612127,
+   "box_aspect": 0.7539671539082262,
+   "orientation": "l",
+   "orientation_source": "predicted",
+   "orientation_p": 1.0,
+   "mirror_source": "convention",
+   "mirrored_p": null,
+   "terminals": 3,
+   "unconnected_terminals": 0,
+   "extra_contacts": 1,
+   "max_terminal_distance": 0.167,
+   "mean_terminal_distance": 0.1598,
+   "min_net_fanout": 2,
+   "rules": [
+    "extra_contacts"
+   ]
+  }
+ ],
+ "rules": {
+  "unconnected_terminal": 0,
+  "floating_terminal": 3,
+  "shorted_two_terminal": 0,
+  "shorted_source": 0,
+  "drain_source_short": 0,
+  "collector_emitter_short": 0,
+  "extra_contacts": 3,
+  "no_ground": 0,
+  "no_supply": 0,
+  "rail_conflict": 0,
+  "isolated_component": 0
+ },
+ "crossings": [
+  {
+   "kind": "dot_junction",
+   "box": [
+    226.29551696777344,
+    240.84512329101562,
+    246.9403533935547,
+    261.1413269042969
+   ],
+   "score": 0.9243513941764832
+  },
+  {
+   "kind": "dot_junction",
+   "box": [
+    226.82427978515625,
+    126.6255874633789,
+    246.35028076171875,
+    145.96755981445312
+   ],
+   "score": 0.9042653441429138
+  },
+  {
+   "kind": "t_junction",
+   "box": [
+    227.75733947753906,
+    13.26224136352539,
+    244.01393127441406,
+    29.214614868164062
+   ],
+   "score": 0.8072899580001831
+  }
+ ],
+ "crossings_cut": 0,
+ "line_width": 2.0,
+ "score": {
+  "circuit_id": "090",
+  "ned": 0.12,
+  "ned_exact": true,
+  "graph_isomorphism": false,
+  "connection_precision": 0.75,
+  "connection_recall": 0.8571428571428571,
+  "components_true": 5,
+  "components_pred": 5,
+  "alignment": {
+   "ged": 3.0,
+   "exact": true,
+   "isomorphic": false,
+   "component_map": {
+    "C1": "C1",
+    "C2": "C5",
+    "C3": "C2",
+    "C4": "C4",
+    "C5": "C3"
+   },
+   "net_map": {
+    "net1": "Vref",
+    "net2": "net13",
+    "net3": "net11",
+    "VDD": "VDD",
+    "net4": "OUT",
+    "net5": "IN",
+    "GND": "GND"
+   }
+  },
+  "errors": [
+   {
+    "kind": "wrong_connection",
+    "category": "capacitor",
+    "gt_component": "C4",
+    "pred_component": "C4",
+    "detail": "terminal nets differ"
+   }
+  ]
+ }
+}

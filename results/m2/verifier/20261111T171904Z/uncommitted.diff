@@ -1,0 +1,454 @@
+diff --git a/src/vca/metrics/alignment.py b/src/vca/metrics/alignment.py
+index 3bc96be..fe863f8 100644
+--- a/src/vca/metrics/alignment.py
++++ b/src/vca/metrics/alignment.py
+@@ -19,7 +19,7 @@ from typing import Literal
+ import networkx as nx
+ from networkx.algorithms import isomorphism
+ 
+-from vca.metrics.assignment_ged import heuristic_mapping
++from vca.metrics.assignment_ged import descend, heuristic_mapping, lower_bound
+ from vca.metrics.canonical import (
+     SYMMETRIC_CATEGORIES,
+     build_graph,
+@@ -57,6 +57,8 @@ class Alignment:
+     isomorphic: bool
+     component_map: dict[str, str] = field(default_factory=dict)
+     net_map: dict[str, str] = field(default_factory=dict)
++    # GED lower bound when the search did not finish (else GED itself).
++    lower_bound: float | None = None
+ 
+ 
+ def _node_subst_cost(first: dict, second: dict) -> float:
+@@ -122,6 +124,7 @@ def align(
+             isomorphic=True,
+             component_map=component_map,
+             net_map=net_map,
++            lower_bound=0.0,
+         )
+ 
+     best_pairs: list[tuple[str | None, str | None]] | None = None
+@@ -144,16 +147,28 @@ def align(
+ 
+     exact = time.monotonic() - started < timeout
+ 
++    bound = None
+     if not exact:
+         # The search stopped early; its best path can be far from optimal.
+-        # An assignment-based mapping is often much closer: keep the lower.
+-        mapping, cost = heuristic_mapping(pred_graph, gt_graph)
+-        if best_cost is None or cost < best_cost:
+-            used = {v for v in mapping.values() if v is not None}
+-            best_pairs = list(mapping.items()) + [
+-                (None, v) for v in gt_graph if v not in used
+-            ]
+-            best_cost = cost
++        # Local search from it and from an assignment-based mapping is often
++        # much closer: keep the cheapest real edit path.
++        starts = [heuristic_mapping(pred_graph, gt_graph)]
++        if best_pairs is not None:
++            starts.append(
++                descend(
++                    pred_graph,
++                    gt_graph,
++                    {u: v for u, v in best_pairs if u is not None},
++                )
++            )
++        for mapping, cost in starts:
++            if best_cost is None or cost < best_cost:
++                used = {v for v in mapping.values() if v is not None}
++                best_pairs = list(mapping.items()) + [
++                    (None, v) for v in gt_graph if v not in used
++                ]
++                best_cost = cost
++        bound = lower_bound(pred_graph, gt_graph)
+ 
+     if best_pairs is None:
+         return Alignment(ged=None, exact=False, isomorphic=False)
+@@ -165,6 +180,7 @@ def align(
+         isomorphic=False,
+         component_map=component_map,
+         net_map=net_map,
++        lower_bound=float(best_cost) if exact else bound,
+     )
+ 
+ 
+@@ -179,6 +195,17 @@ def ned_from_alignment(
+     return alignment.ged / denominator
+ 
+ 
++def ned_lower_bound_from_alignment(
++    alignment: Alignment,
++    ground_truth: Netlist,
++) -> float | None:
++    """NED the circuit is guaranteed to reach or exceed (GED lower bound)."""
++    denominator = ned_denominator(ground_truth)
++    if alignment.lower_bound is None or denominator == 0:
++        return None
++    return alignment.lower_bound / denominator
++
++
+ def _terminal_nets(netlist: Netlist) -> dict[str, dict[str, str | None]]:
+     """Map component id -> terminal name -> net name (None if floating)."""
+     result: dict[str, dict[str, str | None]] = {
+diff --git a/src/vca/metrics/assignment_ged.py b/src/vca/metrics/assignment_ged.py
+index 965be5f..6614675 100644
+--- a/src/vca/metrics/assignment_ged.py
++++ b/src/vca/metrics/assignment_ged.py
+@@ -9,7 +9,11 @@ directly, then prices it exactly:
+ 1. Components are paired by category and wiring signature (Hungarian).
+ 2. Nets and components are re-paired in turn, each given the other
+    (block-coordinate descent on the shared-endpoint count).
+-3. Pairwise swaps that lower the exact edit cost are applied until none do.
++3. Swaps, moves to a free node and unmappings that lower the exact edit
++   cost are applied until none do (``descend``).
++
++``lower_bound`` gives the BRANCH lower bound, so each circuit can report
++how far its upper bound might still be from the optimum.
+ 
+ ``mapping_cost`` is the cost of the edit path a mapping implies (unit
+ costs, the same as the exact search), so the result is a valid GED upper
+@@ -145,35 +149,69 @@ def heuristic_mapping(g1: nx.MultiGraph, g2: nx.MultiGraph) -> tuple[Mapping, fl
+             break
+         comp_map = new_map
+ 
+-    mapping: Mapping = comp_map | net_map
+-    best = mapping_cost(g1, g2, mapping)
+-    return _swap_descent(g1, g2, mapping, best)
++    return descend(g1, g2, comp_map | net_map)
+ 
+ 
+-def _swap_descent(g1, g2, mapping: Mapping, best: float, rounds: int = 3):
+-    """Swap the targets of two same-kind nodes (or retarget to a free node)."""
++def descend(
++    g1: nx.MultiGraph, g2: nx.MultiGraph, mapping: Mapping, rounds: int = 20
++) -> tuple[Mapping, float]:
++    """Local search from ``mapping``: swap two nodes' targets, move a node to
++    a free target, or unmap it, while the exact cost drops."""
++    mapping = {u: mapping.get(u) for u in g1}
++    best = mapping_cost(g1, g2, mapping)
+     for _ in range(rounds):
+         improved = False
+         for kind in ("net", "component"):
+             ours = _nodes(g1, kind)
+-            free = [n for n in _nodes(g2, kind) if n not in set(mapping.values())]
++            theirs = _nodes(g2, kind)
+             for i, a in enumerate(ours):
+-                options = [(b, None) for b in ours[i + 1 :]] + [(None, f) for f in free]
+-                for b, f in options:
++                taken = set(mapping.values())
++                trials = [(b, "swap") for b in ours[i + 1 :]]
++                trials += [(f, "move") for f in theirs if f not in taken]
++                trials += [(None, "unmap")] if mapping[a] is not None else []
++                for target, how in trials:
+                     trial = dict(mapping)
+-                    if b is not None:
+-                        trial[a], trial[b] = mapping[b], mapping[a]
++                    if how == "swap":
++                        trial[a], trial[target] = mapping[target], mapping[a]
+                     else:
+-                        trial[a] = f
++                        trial[a] = target
+                     cost = mapping_cost(g1, g2, trial)
+                     if cost < best:
+                         mapping, best, improved = trial, cost, True
+-                        free = [
+-                            n
+-                            for n in _nodes(g2, kind)
+-                            if n not in set(mapping.values())
+-                        ]
+                         break
+         if not improved:
+             break
+     return mapping, best
++
++
++def lower_bound(g1: nx.MultiGraph, g2: nx.MultiGraph) -> float:
++    """BRANCH lower bound on unit-cost GED (Blumenthal & Gamper).
++
++    Each node is priced with its own substitution cost plus half the
++    mismatch between its incident edge labels; every edge is shared by two
++    nodes, so the optimal assignment of these prices never exceeds GED.
++    """
++    n1, n2 = list(g1), list(g2)
++
++    def labels(graph, node):
++        return Counter(d["terminal"] for *_, d in graph.edges(node, data=True))
++
++    lab1 = [labels(g1, u) for u in n1]
++    lab2 = [labels(g2, v) for v in n2]
++    size = len(n1) + len(n2)
++    cost = np.full((size, size), _FAR)
++    for i, u in enumerate(n1):
++        a, deg_a = g1.nodes[u], sum(lab1[i].values())
++        for j, v in enumerate(n2):
++            b, deg_b = g2.nodes[v], sum(lab2[j].values())
++            node = float(
++                a["node_type"] != b["node_type"] or a["category"] != b["category"]
++            )
++            common = sum((lab1[i] & lab2[j]).values())
++            cost[i, j] = node + 0.5 * (max(deg_a, deg_b) - common)
++        cost[i, len(n2) + i] = 1 + 0.5 * deg_a  # delete u
++    for j in range(len(n2)):
++        cost[len(n1) + j, j] = 1 + 0.5 * sum(lab2[j].values())  # insert v
++    cost[len(n1) :, len(n2) :] = 0
++    rows, cols = linear_sum_assignment(cost)
++    return float(cost[rows, cols].sum())
+diff --git a/src/vca/netting/extract.py b/src/vca/netting/extract.py
+index d9d4aa0..ca4bd6e 100644
+--- a/src/vca/netting/extract.py
++++ b/src/vca/netting/extract.py
+@@ -8,7 +8,8 @@ nets. Then:
+    ``cross-line-curved`` class) are cut and their arms re-joined straight
+    through (left-right, top-bottom). Plain four-way crossings without a dot
+    are found from the image and treated the same way (textbook convention:
+-   no dot, no connection) unless a dot / T-junction detection covers them.
++   no dot, no connection) unless a dot-junction detection covers them,
++   including crossings on a lead at the edge of a symbol box.
+ 2. Rails. Every net touching a ``gnd`` symbol becomes one ``GND`` net, every
+    net touching ``vdd`` one ``VDD`` net.
+ 3. Terminals. Wire ends in a thin ring around a component box are matched
+@@ -23,7 +24,7 @@ returned in :class:`NetExtraction` for the verifier.
+ from __future__ import annotations
+ 
+ from collections import Counter
+-from dataclasses import dataclass, field
++from dataclasses import dataclass, field, replace
+ 
+ import numpy as np
+ from PIL import Image
+@@ -230,6 +231,32 @@ def find_through_lines(
+     return found
+ 
+ 
++def _assignment_cost(layout: TerminalLayout, contacts, box, w, h) -> float:
++    cost = np.array(
++        [
++            [
++                np.hypot((cx - box[0]) / w - ax, (cy - box[1]) / h - ay)
++                for ax, ay in layout.anchors.values()
++            ]
++            for cx, cy, *_ in contacts
++        ]
++    )
++    rows, cols = linear_sum_assignment(cost)
++    return float(cost[rows, cols].sum())
++
++
++def _axis_from_contacts(d, category, layout, contacts, w, h) -> TerminalLayout:
++    """Of the horizontal and vertical layouts, the one the wires fit best."""
++    vertical = "u" if category == "voltage" else "d"
++    other = vertical if layout.orientation == "l" else "l"
++    alternative = terminal_layout(d.detector_class, category, d.box, other)
++    best = min(
++        (layout, alternative),
++        key=lambda c: _assignment_cost(c, contacts, d.box, w, h),
++    )
++    return replace(best, orientation_source="contacts")
++
++
+ def _side_labels(labels: np.ndarray, box: Box, reach: int) -> dict[str, set[int]]:
+     """Wire labels just outside each side of a cut box."""
+     h, w = labels.shape
+@@ -260,7 +287,10 @@ def extract_netlist(
+     hops = [c.box for c in crossings if c.kind == "hop"] + [
+         d.box for d in detections if d.detector_class in _HOP_CLASSES
+     ]
+-    joins = [c.box for c in crossings if c.kind != "hop"]
++    # A plain four-way crossing is not one of the crossing model's classes,
++    # so it is usually called a T; only a drawn dot overrules the arm test.
++    # (On the 122 eval circuits, trusting those Ts costs 0.066 NED.)
++    joins = [c.box for c in crossings if c.kind == "dot_junction"]
+     symbols = [d for d in detections if d.detector_class not in _HOP_CLASSES]
+ 
+     wires = ink.copy()
+@@ -268,7 +298,19 @@ def extract_netlist(
+         x1, y1, x2, y2 = _clip(d.box, pad, ink.shape)
+         wires[y1:y2, x1:x2] = False
+     if detect_plain_crossings:
+-        hops += find_plain_crossings(wires, lw, keep=joins + [d.box for d in symbols])
++        # A wire can cross a terminal lead right at a symbol's box edge, so
++        # look for crossings with only the symbol interiors blanked.
++        inset = 2 * lw
++        cores = [
++            (x1 + inset, y1 + inset, x2 - inset, y2 - inset)
++            for x1, y1, x2, y2 in (d.box for d in symbols)
++            if x2 - x1 > 2 * inset and y2 - y1 > 2 * inset
++        ]
++        open_ink = ink.copy()
++        for box in cores:
++            x1, y1, x2, y2 = _clip(box, 0, ink.shape)
++            open_ink[y1:y2, x1:x2] = False
++        hops += find_plain_crossings(open_ink, lw, keep=joins + cores)
+     for box in hops:
+         x1, y1, x2, y2 = _clip(box, 0, ink.shape)
+         wires[y1:y2, x1:x2] = False
+@@ -375,13 +417,17 @@ def extract_netlist(
+             d.detector_class, category, d.box, d.orientation, d.mirrored
+         )
+         component_id = f"C{index + 1}"
+-        report = ComponentReport(component_id, d.detector_class, layout)
+         contacts = [
+             c for c in contacts if anchor_hits[c[2]] >= 2 or root_size[c[2]] >= min_wire
+         ]
+-        names = list(layout.anchors)
+         x1, y1, x2, y2 = d.box
+         w, h = max(x2 - x1, 1.0), max(y2 - y1, 1.0)
++        if layout.orientation_source == "box_shape" and contacts:
++            # Box shape misleads (a capacitor's plates make a horizontally
++            # wired symbol tall): take the axis the wires actually reach.
++            layout = _axis_from_contacts(d, category, layout, contacts, w, h)
++        report = ComponentReport(component_id, d.detector_class, layout)
++        names = list(layout.anchors)
+         if contacts:
+ 
+             def anchor_cost(cx: float, cy: float) -> list[float]:
+diff --git a/src/vca/netting/terminals.py b/src/vca/netting/terminals.py
+index 59aa0d2..5abff6d 100644
+--- a/src/vca/netting/terminals.py
++++ b/src/vca/netting/terminals.py
+@@ -94,7 +94,7 @@ class TerminalLayout:
+     anchors: dict[str, Point]  # terminal -> normalised (x, y) in the box
+     orientation: str
+     mirrored: bool
+-    orientation_source: str  # "predicted", "box_shape" or "default"
++    orientation_source: str  # "predicted", "contacts", "box_shape" or "default"
+     mirror_source: str  # "predicted", "convention" or "n/a"
+ 
+ 
+
+--- new file: src/vca/verify/model.py
+"""Verifier: a calibrated probability that a predicted component is wrong.
+
+Trained on the pipeline's per-component evidence (``component_features``)
+and labelled by the GED alignment (a component is wrong when the alignment
+puts it in any error). Gradient boosting ranks; isotonic regression, fitted
+on held-out circuits, turns scores into probabilities. Splits are always by
+circuit: components of one drawing share its style and its mistakes.
+"""
+
+from __future__ import annotations
+
+from collections.abc import Iterable
+
+import numpy as np
+from sklearn.calibration import CalibratedClassifierCV
+from sklearn.ensemble import HistGradientBoostingClassifier
+from sklearn.metrics import brier_score_loss, roc_auc_score
+from sklearn.model_selection import GroupKFold
+
+from vca.verify.rules import CIRCUIT_RULES, COMPONENT_RULES
+
+NUMERIC = (
+    "detector_score",
+    "box_area",
+    "box_aspect",
+    "orientation_p",
+    "mirrored_p",
+    "terminals",
+    "unconnected_terminals",
+    "extra_contacts",
+    "max_terminal_distance",
+    "mean_terminal_distance",
+    "min_net_fanout",
+)
+CATEGORICAL = ("category", "orientation_source", "mirror_source")
+CIRCUIT = ("components", "single_terminal_nets", "crossings_cut")
+# Every numeric feature is >= 0. Not NaN: an all-missing column (one
+# fold without mirror scores) breaks the booster's binning.
+MISSING = -1.0
+
+
+def feature_names(vocab: dict[str, list[str]]) -> list[str]:
+    return (
+        list(NUMERIC)
+        + [f"rule:{r}" for r in COMPONENT_RULES]
+        + [f"circuit_rule:{r}" for r in CIRCUIT_RULES]
+        + [f"circuit:{c}" for c in CIRCUIT]
+        + [f"{k}={v}" for k in CATEGORICAL for v in vocab[k]]
+    )
+
+
+def vocabulary(rows: Iterable[dict]) -> dict[str, list[str]]:
+    rows = list(rows)
+    return {k: sorted({str(r.get(k)) for r in rows}) for k in CATEGORICAL}
+
+
+def featurize(rows: list[dict], vocab: dict[str, list[str]]) -> np.ndarray:
+    """One row per component; ``row["circuit"]`` holds circuit-level context."""
+    out = []
+    for r in rows:
+        circuit = r.get("circuit", {})
+        x = [MISSING if r.get(k) is None else float(r[k]) for k in NUMERIC]
+        x += [float(rule in r.get("rules", [])) for rule in COMPONENT_RULES]
+        x += [
+            float(circuit.get("rules", {}).get(rule, 0) > 0) for rule in CIRCUIT_RULES
+        ]
+        x += [float(circuit.get(c, 0)) for c in CIRCUIT]
+        x += [float(str(r.get(k)) == v) for k in CATEGORICAL for v in vocab[k]]
+        out.append(x)
+    return np.asarray(out, dtype=float)
+
+
+def make_model(seed: int = 0, calibration_splits=None) -> CalibratedClassifierCV:
+    booster = HistGradientBoostingClassifier(
+        max_iter=200,
+        learning_rate=0.05,
+        max_leaf_nodes=15,
+        min_samples_leaf=20,
+        l2_regularization=1.0,
+        random_state=seed,
+    )
+    return CalibratedClassifierCV(
+        booster, method="isotonic", cv=calibration_splits or 5, ensemble=True
+    )
+
+
+def fit(x: np.ndarray, y: np.ndarray, groups: np.ndarray, seed: int = 0):
+    """Boosting + isotonic calibration, calibration folds split by circuit."""
+    folds = min(5, len(set(groups)))
+    splits = list(GroupKFold(folds).split(x, y, groups))
+    return make_model(seed, splits).fit(x, y)
+
+
+def expected_calibration_error(y: np.ndarray, p: np.ndarray, bins: int = 10) -> float:
+    edges = np.linspace(0, 1, bins + 1)
+    which = np.clip(np.digitize(p, edges[1:-1]), 0, bins - 1)
+    ece = 0.0
+    for b in range(bins):
+        mask = which == b
+        if mask.any():
+            ece += mask.mean() * abs(y[mask].mean() - p[mask].mean())
+    return float(ece)
+
+
+def flag_scores(y: np.ndarray, flagged: np.ndarray) -> dict[str, float]:
+    tp = float((flagged & (y == 1)).sum())
+    return {
+        "flagged": int(flagged.sum()),
+        "precision": tp / max(flagged.sum(), 1),
+        "recall": tp / max((y == 1).sum(), 1),
+    }
+
+
+def evaluate(y: np.ndarray, p: np.ndarray, threshold: float = 0.5) -> dict:
+    return {
+        "components": int(len(y)),
+        "error_rate": float(y.mean()),
+        "auroc": float(roc_auc_score(y, p)),
+        "ece": expected_calibration_error(y, p),
+        "brier": float(brier_score_loss(y, p)),
+        f"flag@{threshold}": flag_scores(y, p >= threshold),
+    }
+
+
+def cross_validate(
+    x: np.ndarray, y: np.ndarray, groups: np.ndarray, folds: int = 5, seed: int = 0
+) -> np.ndarray:
+    """Out-of-fold P(wrong) for every component, outer folds by circuit."""
+    p = np.zeros(len(y))
+    for train, test in GroupKFold(folds).split(x, y, groups):
+        p[test] = fit(x[train], y[train], groups[train], seed).predict_proba(x[test])[
+            :, 1
+        ]
+    return p

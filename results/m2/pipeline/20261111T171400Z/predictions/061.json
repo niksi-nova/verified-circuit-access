@@ -1,0 +1,611 @@
+{
+ "image": "061.png",
+ "netlist": {
+  "schema_version": "1.0.0",
+  "components": [
+   {
+    "id": "C1",
+    "canonical_category": "voltage",
+    "terminals": [
+     {
+      "name": "Positive"
+     },
+     {
+      "name": "Negative"
+     }
+    ],
+    "bbox": {
+     "x": 419.01947021484375,
+     "y": 412.6383056640625,
+     "width": 46.374267578125,
+     "height": 46.445220947265625
+    }
+   },
+   {
+    "id": "C2",
+    "canonical_category": "resistor",
+    "terminals": [
+     {
+      "name": "Pos"
+     },
+     {
+      "name": "Neg"
+     }
+    ],
+    "bbox": {
+     "x": 58.70676040649414,
+     "y": 571.5424194335938,
+     "width": 51.03984451293945,
+     "height": 109.45941162109375
+    }
+   },
+   {
+    "id": "C3",
+    "canonical_category": "resistor",
+    "terminals": [
+     {
+      "name": "Pos"
+     },
+     {
+      "name": "Neg"
+     }
+    ],
+    "bbox": {
+     "x": 576.0559692382812,
+     "y": 510.7647399902344,
+     "width": 51.37841796875,
+     "height": 109.07199096679688
+    }
+   },
+   {
+    "id": "C4",
+    "canonical_category": "resistor",
+    "terminals": [
+     {
+      "name": "Pos"
+     },
+     {
+      "name": "Neg"
+     }
+    ],
+    "bbox": {
+     "x": 698.4146118164062,
+     "y": 571.8245849609375,
+     "width": 51.16802978515625,
+     "height": 109.26580810546875
+    }
+   },
+   {
+    "id": "C5",
+    "canonical_category": "pmos",
+    "terminals": [
+     {
+      "name": "Gate"
+     },
+     {
+      "name": "Source"
+     },
+     {
+      "name": "Drain"
+     }
+    ],
+    "bbox": {
+     "x": 197.6239471435547,
+     "y": 154.75363159179688,
+     "width": 63.96327209472656,
+     "height": 69.82640075683594
+    }
+   },
+   {
+    "id": "C6",
+    "canonical_category": "pmos",
+    "terminals": [
+     {
+      "name": "Gate"
+     },
+     {
+      "name": "Source"
+     },
+     {
+      "name": "Drain"
+     }
+    ],
+    "bbox": {
+     "x": 545.0806884765625,
+     "y": 151.2893524169922,
+     "width": 63.17822265625,
+     "height": 73.73193359375
+    }
+   },
+   {
+    "id": "C7",
+    "canonical_category": "diff-amp",
+    "terminals": [
+     {
+      "name": "Out"
+     },
+     {
+      "name": "InP"
+     },
+     {
+      "name": "InN"
+     }
+    ],
+    "bbox": {
+     "x": 317.2723388671875,
+     "y": 240.6041259765625,
+     "width": 173.26376342773438,
+     "height": 162.53115844726562
+    }
+   },
+   {
+    "id": "C8",
+    "canonical_category": "diode",
+    "terminals": [
+     {
+      "name": "Out"
+     },
+     {
+      "name": "In"
+     }
+    ],
+    "bbox": {
+     "x": 581.3724365234375,
+     "y": 651.7923583984375,
+     "width": 40.18597412109375,
+     "height": 32.0963134765625
+    }
+   },
+   {
+    "id": "C9",
+    "canonical_category": "diode",
+    "terminals": [
+     {
+      "name": "Out"
+     },
+     {
+      "name": "In"
+     }
+    ],
+    "bbox": {
+     "x": 184.11207580566406,
+     "y": 589.3486328125,
+     "width": 40.88226318359375,
+     "height": 31.10284423828125
+    }
+   }
+  ],
+  "nets": [
+   {
+    "name": "net1",
+    "endpoints": [
+     {
+      "component_id": "C1",
+      "terminal_name": "Negative"
+     },
+     {
+      "component_id": "C7",
+      "terminal_name": "InN"
+     }
+    ]
+   },
+   {
+    "name": "net2",
+    "endpoints": [
+     {
+      "component_id": "C1",
+      "terminal_name": "Positive"
+     },
+     {
+      "component_id": "C3",
+      "terminal_name": "Neg"
+     },
+     {
+      "component_id": "C4",
+      "terminal_name": "Neg"
+     },
+     {
+      "component_id": "C6",
+      "terminal_name": "Drain"
+     }
+    ]
+   },
+   {
+    "name": "net3",
+    "endpoints": [
+     {
+      "component_id": "C2",
+      "terminal_name": "Neg"
+     },
+     {
+      "component_id": "C5",
+      "terminal_name": "Drain"
+     },
+     {
+      "component_id": "C7",
+      "terminal_name": "InP"
+     },
+     {
+      "component_id": "C9",
+      "terminal_name": "In"
+     }
+    ]
+   },
+   {
+    "name": "net4",
+    "endpoints": [
+     {
+      "component_id": "C2",
+      "terminal_name": "Pos"
+     },
+     {
+      "component_id": "C4",
+      "terminal_name": "Pos"
+     },
+     {
+      "component_id": "C8",
+      "terminal_name": "Out"
+     },
+     {
+      "component_id": "C9",
+      "terminal_name": "Out"
+     }
+    ]
+   },
+   {
+    "name": "net6",
+    "endpoints": [
+     {
+      "component_id": "C3",
+      "terminal_name": "Pos"
+     },
+     {
+      "component_id": "C8",
+      "terminal_name": "In"
+     }
+    ]
+   },
+   {
+    "name": "net9",
+    "endpoints": [
+     {
+      "component_id": "C5",
+      "terminal_name": "Source"
+     },
+     {
+      "component_id": "C6",
+      "terminal_name": "Source"
+     }
+    ]
+   },
+   {
+    "name": "net10",
+    "endpoints": [
+     {
+      "component_id": "C5",
+      "terminal_name": "Gate"
+     },
+     {
+      "component_id": "C6",
+      "terminal_name": "Gate"
+     },
+     {
+      "component_id": "C7",
+      "terminal_name": "Out"
+     }
+    ]
+   }
+  ]
+ },
+ "components": [
+  {
+   "component_id": "C1",
+   "detector_class": "voltage",
+   "category": "voltage",
+   "detector_score": 0.9307113885879517,
+   "box_area": 2153.8631039336324,
+   "box_aspect": 0.9984723214209448,
+   "orientation": "l",
+   "orientation_source": "contacts",
+   "orientation_p": null,
+   "mirror_source": "n/a",
+   "mirrored_p": null,
+   "terminals": 2,
+   "unconnected_terminals": 0,
+   "extra_contacts": 0,
+   "max_terminal_distance": 0.9407,
+   "mean_terminal_distance": 0.6172,
+   "min_net_fanout": 2,
+   "rules": []
+  },
+  {
+   "component_id": "C2",
+   "detector_class": "resistor",
+   "category": "resistor",
+   "detector_score": 0.9196533560752869,
+   "box_area": 5586.791349618463,
+   "box_aspect": 0.46629014131393015,
+   "orientation": "d",
+   "orientation_source": "contacts",
+   "orientation_p": null,
+   "mirror_source": "n/a",
+   "mirrored_p": null,
+   "terminals": 2,
+   "unconnected_terminals": 0,
+   "extra_contacts": 1,
+   "max_terminal_distance": 0.135,
+   "mean_terminal_distance": 0.13255,
+   "min_net_fanout": 4,
+   "rules": [
+    "extra_contacts"
+   ]
+  },
+  {
+   "component_id": "C3",
+   "detector_class": "resistor",
+   "category": "resistor",
+   "detector_score": 0.9179628491401672,
+   "box_area": 5603.946340575814,
+   "box_aspect": 0.4710505191418973,
+   "orientation": "d",
+   "orientation_source": "contacts",
+   "orientation_p": null,
+   "mirror_source": "n/a",
+   "mirrored_p": null,
+   "terminals": 2,
+   "unconnected_terminals": 0,
+   "extra_contacts": 1,
+   "max_terminal_distance": 0.1356,
+   "mean_terminal_distance": 0.1286,
+   "min_net_fanout": 2,
+   "rules": [
+    "extra_contacts"
+   ]
+  },
+  {
+   "component_id": "C4",
+   "detector_class": "resistor",
+   "category": "resistor",
+   "detector_score": 0.9164935946464539,
+   "box_area": 5590.916123639792,
+   "box_aspect": 0.46828949213249166,
+   "orientation": "d",
+   "orientation_source": "contacts",
+   "orientation_p": null,
+   "mirror_source": "n/a",
+   "mirrored_p": null,
+   "terminals": 2,
+   "unconnected_terminals": 0,
+   "extra_contacts": 1,
+   "max_terminal_distance": 0.1371,
+   "mean_terminal_distance": 0.13295,
+   "min_net_fanout": 4,
+   "rules": [
+    "extra_contacts"
+   ]
+  },
+  {
+   "component_id": "C5",
+   "detector_class": "pmos",
+   "category": "pmos",
+   "detector_score": 0.9054935574531555,
+   "box_area": 4466.325071004918,
+   "box_aspect": 0.9160327813182412,
+   "orientation": "r",
+   "orientation_source": "predicted",
+   "orientation_p": 0.9999997615814209,
+   "mirror_source": "convention",
+   "mirrored_p": null,
+   "terminals": 3,
+   "unconnected_terminals": 0,
+   "extra_contacts": 3,
+   "max_terminal_distance": 0.2336,
+   "mean_terminal_distance": 0.22,
+   "min_net_fanout": 2,
+   "rules": [
+    "extra_contacts"
+   ]
+  },
+  {
+   "component_id": "C6",
+   "detector_class": "pmos",
+   "category": "pmos",
+   "detector_score": 0.9024837613105774,
+   "box_area": 4658.252517461777,
+   "box_aspect": 0.8568637709184586,
+   "orientation": "l",
+   "orientation_source": "predicted",
+   "orientation_p": 0.9999765157699585,
+   "mirror_source": "convention",
+   "mirrored_p": null,
+   "terminals": 3,
+   "unconnected_terminals": 0,
+   "extra_contacts": 4,
+   "max_terminal_distance": 0.2253,
+   "mean_terminal_distance": 0.22340000000000002,
+   "min_net_fanout": 2,
+   "rules": [
+    "extra_contacts"
+   ]
+  },
+  {
+   "component_id": "C7",
+   "detector_class": "single-end-amp",
+   "category": "diff-amp",
+   "detector_score": 0.8962286710739136,
+   "box_area": 28160.760186842643,
+   "box_aspect": 1.0660341382108036,
+   "orientation": "u",
+   "orientation_source": "predicted",
+   "orientation_p": 0.999998927116394,
+   "mirror_source": "predicted",
+   "mirrored_p": 0.5046835541725159,
+   "terminals": 3,
+   "unconnected_terminals": 0,
+   "extra_contacts": 1,
+   "max_terminal_distance": 0.1879,
+   "mean_terminal_distance": 0.12403333333333333,
+   "min_net_fanout": 2,
+   "rules": [
+    "extra_contacts"
+   ]
+  },
+  {
+   "component_id": "C8",
+   "detector_class": "diode",
+   "category": "diode",
+   "detector_score": 0.8807128071784973,
+   "box_area": 1289.8216227516532,
+   "box_aspect": 1.2520432962009334,
+   "orientation": "d",
+   "orientation_source": "predicted",
+   "orientation_p": 1.0,
+   "mirror_source": "n/a",
+   "mirrored_p": null,
+   "terminals": 2,
+   "unconnected_terminals": 0,
+   "extra_contacts": 3,
+   "max_terminal_distance": 0.461,
+   "mean_terminal_distance": 0.43485,
+   "min_net_fanout": 2,
+   "rules": [
+    "extra_contacts"
+   ]
+  },
+  {
+   "component_id": "C9",
+   "detector_class": "diode",
+   "category": "diode",
+   "detector_score": 0.8727795481681824,
+   "box_area": 1271.5546639077365,
+   "box_aspect": 1.3144220146039258,
+   "orientation": "d",
+   "orientation_source": "predicted",
+   "orientation_p": 0.9999998807907104,
+   "mirror_source": "n/a",
+   "mirrored_p": null,
+   "terminals": 2,
+   "unconnected_terminals": 0,
+   "extra_contacts": 3,
+   "max_terminal_distance": 0.4615,
+   "mean_terminal_distance": 0.44865,
+   "min_net_fanout": 4,
+   "rules": [
+    "extra_contacts"
+   ]
+  }
+ ],
+ "rules": {
+  "unconnected_terminal": 0,
+  "floating_terminal": 0,
+  "shorted_two_terminal": 0,
+  "shorted_source": 0,
+  "drain_source_short": 0,
+  "collector_emitter_short": 0,
+  "extra_contacts": 8,
+  "no_ground": 1,
+  "no_supply": 1,
+  "rail_conflict": 0,
+  "isolated_component": 0
+ },
+ "crossings": [
+  {
+   "kind": "dot_junction",
+   "box": [
+    583.97119140625,
+    478.63580322265625,
+    617.090087890625,
+    512.1864624023438
+   ],
+   "score": 0.9327652454376221
+  },
+  {
+   "kind": "dot_junction",
+   "box": [
+    187.79306030273438,
+    478.4366149902344,
+    221.12554931640625,
+    512.70849609375
+   ],
+   "score": 0.9313802719116211
+  },
+  {
+   "kind": "dot_junction",
+   "box": [
+    385.8951721191406,
+    171.91610717773438,
+    419.5777282714844,
+    204.82614135742188
+   ],
+   "score": 0.9258590340614319
+  },
+  {
+   "kind": "t_junction",
+   "box": [
+    193.7053680419922,
+    700.9236450195312,
+    213.8941192626953,
+    721.4253540039062
+   ],
+   "score": 0.9094604849815369
+  },
+  {
+   "kind": "t_junction",
+   "box": [
+    589.9916381835938,
+    700.4063720703125,
+    611.7031860351562,
+    722.6063232421875
+   ],
+   "score": 0.9015505909919739
+  }
+ ],
+ "crossings_cut": 0,
+ "line_width": 5.0,
+ "score": {
+  "circuit_id": "061",
+  "ned": 0.05405405405405406,
+  "ned_lower_bound": 0.02702702702702703,
+  "ned_exact": false,
+  "graph_isomorphism": false,
+  "connection_precision": 0.7142857142857143,
+  "connection_recall": 0.7142857142857143,
+  "components_true": 9,
+  "components_pred": 9,
+  "alignment": {
+   "ged": 2.0,
+   "exact": false,
+   "isomorphic": false,
+   "component_map": {
+    "C1": "C9",
+    "C2": "C6",
+    "C3": "C5",
+    "C4": "C4",
+    "C5": "C1",
+    "C6": "C2",
+    "C7": "C3",
+    "C8": "C7",
+    "C9": "C8"
+   },
+   "net_map": {
+    "net1": "net4",
+    "net2": "Vb",
+    "net3": "Va",
+    "net4": "GND",
+    "net6": "net2",
+    "net9": "VDD",
+    "net10": "net1"
+   },
+   "lower_bound": 1.0
+  },
+  "errors": [
+   {
+    "kind": "wrong_polarity",
+    "category": "voltage",
+    "gt_component": "C9",
+    "pred_component": "C1",
+    "detail": "terminals: Negative, Positive"
+   }
+  ]
+ }
+}

@@ -1,0 +1,1231 @@
+{
+  "circuits": 122,
+  "macro_ned": 0.60748,
+  "ned_exact_fraction": 0.22131,
+  "graph_isomorphism_accuracy": 0.15574,
+  "macro_connection_precision": 0.30687,
+  "macro_connection_recall": 0.3236,
+  "component_count_match": 0.97541,
+  "per_circuit": [
+    {
+      "circuit_id": "001",
+      "ned": 0.4528301886792453,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.1,
+      "connection_recall": 0.1,
+      "components_true": 11,
+      "components_pred": 11
+    },
+    {
+      "circuit_id": "002",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 5,
+      "components_pred": 5
+    },
+    {
+      "circuit_id": "003",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 7,
+      "components_pred": 7
+    },
+    {
+      "circuit_id": "004",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 3,
+      "components_pred": 3
+    },
+    {
+      "circuit_id": "006",
+      "ned": 0.37777777777777777,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.2222222222222222,
+      "connection_recall": 0.25,
+      "components_true": 10,
+      "components_pred": 10
+    },
+    {
+      "circuit_id": "007",
+      "ned": 1.1203703703703705,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 24,
+      "components_pred": 24
+    },
+    {
+      "circuit_id": "008",
+      "ned": 0.9866666666666667,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 15,
+      "components_pred": 15
+    },
+    {
+      "circuit_id": "009",
+      "ned": 0.9052631578947369,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0625,
+      "connection_recall": 0.06666666666666667,
+      "components_true": 21,
+      "components_pred": 21
+    },
+    {
+      "circuit_id": "010",
+      "ned": 1.010204081632653,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0625,
+      "connection_recall": 0.05555555555555555,
+      "components_true": 21,
+      "components_pred": 21
+    },
+    {
+      "circuit_id": "011",
+      "ned": 0.5636363636363636,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.1,
+      "connection_recall": 0.1,
+      "components_true": 11,
+      "components_pred": 11
+    },
+    {
+      "circuit_id": "012",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 5,
+      "components_pred": 5
+    },
+    {
+      "circuit_id": "014",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 6,
+      "components_pred": 6
+    },
+    {
+      "circuit_id": "015",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 6,
+      "components_pred": 6
+    },
+    {
+      "circuit_id": "016",
+      "ned": 0.2553191489361702,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.4444444444444444,
+      "connection_recall": 0.5,
+      "components_true": 11,
+      "components_pred": 11
+    },
+    {
+      "circuit_id": "017",
+      "ned": 0.43137254901960786,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.2857142857142857,
+      "connection_recall": 0.2222222222222222,
+      "components_true": 12,
+      "components_pred": 12
+    },
+    {
+      "circuit_id": "018",
+      "ned": 0.9493670886075949,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 18,
+      "components_pred": 18
+    },
+    {
+      "circuit_id": "019",
+      "ned": 0.8813559322033898,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 11,
+      "components_pred": 11
+    },
+    {
+      "circuit_id": "020",
+      "ned": 0.8529411764705882,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.32142857142857145,
+      "connection_recall": 0.34615384615384615,
+      "components_true": 19,
+      "components_pred": 19
+    },
+    {
+      "circuit_id": "021",
+      "ned": 0.9615384615384616,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.1875,
+      "connection_recall": 0.3,
+      "components_true": 11,
+      "components_pred": 11
+    },
+    {
+      "circuit_id": "022",
+      "ned": 0.8524590163934426,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.375,
+      "connection_recall": 0.46153846153846156,
+      "components_true": 13,
+      "components_pred": 13
+    },
+    {
+      "circuit_id": "023",
+      "ned": 0.9117647058823529,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.09090909090909091,
+      "connection_recall": 0.08333333333333333,
+      "components_true": 14,
+      "components_pred": 14
+    },
+    {
+      "circuit_id": "024",
+      "ned": 1.119047619047619,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 38,
+      "components_pred": 39
+    },
+    {
+      "circuit_id": "025",
+      "ned": 0.3787878787878788,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.09090909090909091,
+      "connection_recall": 0.09090909090909091,
+      "components_true": 15,
+      "components_pred": 15
+    },
+    {
+      "circuit_id": "027",
+      "ned": 1.021978021978022,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 19,
+      "components_pred": 19
+    },
+    {
+      "circuit_id": "028",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 6,
+      "components_pred": 6
+    },
+    {
+      "circuit_id": "029",
+      "ned": 1.1470588235294117,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 29,
+      "components_pred": 29
+    },
+    {
+      "circuit_id": "030",
+      "ned": 0.4807692307692308,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.25,
+      "connection_recall": 0.2222222222222222,
+      "components_true": 11,
+      "components_pred": 11
+    },
+    {
+      "circuit_id": "031",
+      "ned": 0.7272727272727273,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.125,
+      "connection_recall": 0.2,
+      "components_true": 12,
+      "components_pred": 12
+    },
+    {
+      "circuit_id": "032",
+      "ned": 0.7058823529411765,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 11,
+      "components_pred": 11
+    },
+    {
+      "circuit_id": "033",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 5,
+      "components_pred": 5
+    },
+    {
+      "circuit_id": "034",
+      "ned": 0.8524590163934426,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.1875,
+      "connection_recall": 0.21428571428571427,
+      "components_true": 12,
+      "components_pred": 12
+    },
+    {
+      "circuit_id": "035",
+      "ned": 0.5517241379310345,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.08333333333333333,
+      "connection_recall": 0.1,
+      "components_true": 13,
+      "components_pred": 13
+    },
+    {
+      "circuit_id": "036",
+      "ned": 0.8214285714285714,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 11,
+      "components_pred": 11
+    },
+    {
+      "circuit_id": "037",
+      "ned": 0.9545454545454546,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.1111111111111111,
+      "connection_recall": 0.125,
+      "components_true": 13,
+      "components_pred": 13
+    },
+    {
+      "circuit_id": "038",
+      "ned": 0.7727272727272727,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.35714285714285715,
+      "connection_recall": 0.35714285714285715,
+      "components_true": 13,
+      "components_pred": 13
+    },
+    {
+      "circuit_id": "039",
+      "ned": 1.1637931034482758,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.1111111111111111,
+      "connection_recall": 0.058823529411764705,
+      "components_true": 26,
+      "components_pred": 26
+    },
+    {
+      "circuit_id": "040",
+      "ned": 1.1262135922330097,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 21,
+      "components_pred": 21
+    },
+    {
+      "circuit_id": "041",
+      "ned": 0.30303030303030304,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.3333333333333333,
+      "connection_recall": 0.5,
+      "components_true": 8,
+      "components_pred": 8
+    },
+    {
+      "circuit_id": "042",
+      "ned": 1.3085106382978724,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.038461538461538464,
+      "connection_recall": 0.07692307692307693,
+      "components_true": 17,
+      "components_pred": 17
+    },
+    {
+      "circuit_id": "043",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 9,
+      "components_pred": 9
+    },
+    {
+      "circuit_id": "044",
+      "ned": 0.625,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.2727272727272727,
+      "connection_recall": 0.3,
+      "components_true": 12,
+      "components_pred": 12
+    },
+    {
+      "circuit_id": "045",
+      "ned": 0.6716417910447762,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.1875,
+      "connection_recall": 0.23076923076923078,
+      "components_true": 14,
+      "components_pred": 14
+    },
+    {
+      "circuit_id": "046",
+      "ned": 0.5535714285714286,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.16666666666666666,
+      "connection_recall": 0.16666666666666666,
+      "components_true": 11,
+      "components_pred": 11
+    },
+    {
+      "circuit_id": "047",
+      "ned": 0.5333333333333333,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.1,
+      "connection_recall": 0.14285714285714285,
+      "components_true": 7,
+      "components_pred": 7
+    },
+    {
+      "circuit_id": "048",
+      "ned": 0.8395061728395061,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.11764705882352941,
+      "connection_recall": 0.13333333333333333,
+      "components_true": 17,
+      "components_pred": 17
+    },
+    {
+      "circuit_id": "049",
+      "ned": 0.8529411764705882,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 12,
+      "components_pred": 12
+    },
+    {
+      "circuit_id": "050",
+      "ned": 0.6538461538461539,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 6,
+      "components_pred": 6
+    },
+    {
+      "circuit_id": "051",
+      "ned": 1.1180555555555556,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.03333333333333333,
+      "connection_recall": 0.03571428571428571,
+      "components_true": 31,
+      "components_pred": 31
+    },
+    {
+      "circuit_id": "052",
+      "ned": 0.8842105263157894,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.16666666666666666,
+      "connection_recall": 0.16666666666666666,
+      "components_true": 17,
+      "components_pred": 17
+    },
+    {
+      "circuit_id": "053",
+      "ned": 0.5686274509803921,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.18181818181818182,
+      "connection_recall": 0.2,
+      "components_true": 11,
+      "components_pred": 11
+    },
+    {
+      "circuit_id": "054",
+      "ned": 0.925,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 16,
+      "components_pred": 16
+    },
+    {
+      "circuit_id": "055",
+      "ned": 0.5254237288135594,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.18181818181818182,
+      "connection_recall": 0.18181818181818182,
+      "components_true": 13,
+      "components_pred": 13
+    },
+    {
+      "circuit_id": "056",
+      "ned": 0.9428571428571428,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.1111111111111111,
+      "connection_recall": 0.14285714285714285,
+      "components_true": 15,
+      "components_pred": 15
+    },
+    {
+      "circuit_id": "057",
+      "ned": 0.36666666666666664,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.3,
+      "connection_recall": 0.42857142857142855,
+      "components_true": 7,
+      "components_pred": 7
+    },
+    {
+      "circuit_id": "058",
+      "ned": 0.11538461538461539,
+      "ned_exact": true,
+      "graph_isomorphism": false,
+      "connection_precision": 0.7142857142857143,
+      "connection_recall": 0.8333333333333334,
+      "components_true": 6,
+      "components_pred": 6
+    },
+    {
+      "circuit_id": "059",
+      "ned": 0.36363636363636365,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.18181818181818182,
+      "connection_recall": 0.2,
+      "components_true": 9,
+      "components_pred": 9
+    },
+    {
+      "circuit_id": "060",
+      "ned": 0.76,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.07692307692307693,
+      "connection_recall": 0.09090909090909091,
+      "components_true": 10,
+      "components_pred": 10
+    },
+    {
+      "circuit_id": "061",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 9,
+      "components_pred": 9
+    },
+    {
+      "circuit_id": "062",
+      "ned": 1.1240875912408759,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.1111111111111111,
+      "connection_recall": 0.14814814814814814,
+      "components_true": 28,
+      "components_pred": 28
+    },
+    {
+      "circuit_id": "063",
+      "ned": 0.9484536082474226,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.05,
+      "connection_recall": 0.047619047619047616,
+      "components_true": 20,
+      "components_pred": 20
+    },
+    {
+      "circuit_id": "064",
+      "ned": 1.2340425531914894,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.03333333333333333,
+      "connection_recall": 0.058823529411764705,
+      "components_true": 20,
+      "components_pred": 20
+    },
+    {
+      "circuit_id": "065",
+      "ned": 1.0442477876106195,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.1111111111111111,
+      "connection_recall": 0.05555555555555555,
+      "components_true": 25,
+      "components_pred": 25
+    },
+    {
+      "circuit_id": "066",
+      "ned": 0.36363636363636365,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.5,
+      "connection_recall": 0.6,
+      "components_true": 9,
+      "components_pred": 9
+    },
+    {
+      "circuit_id": "067",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 10,
+      "components_pred": 10
+    },
+    {
+      "circuit_id": "068",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 6,
+      "components_pred": 6
+    },
+    {
+      "circuit_id": "069",
+      "ned": 0.06666666666666667,
+      "ned_exact": true,
+      "graph_isomorphism": false,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 7,
+      "components_pred": 7
+    },
+    {
+      "circuit_id": "070",
+      "ned": 0.9552238805970149,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.14285714285714285,
+      "connection_recall": 0.16666666666666666,
+      "components_true": 14,
+      "components_pred": 14
+    },
+    {
+      "circuit_id": "071",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 6,
+      "components_pred": 6
+    },
+    {
+      "circuit_id": "072",
+      "ned": 0.5116279069767442,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.16666666666666666,
+      "connection_recall": 0.18181818181818182,
+      "components_true": 8,
+      "components_pred": 8
+    },
+    {
+      "circuit_id": "073",
+      "ned": 0.9196428571428571,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.3,
+      "connection_recall": 0.2727272727272727,
+      "components_true": 23,
+      "components_pred": 23
+    },
+    {
+      "circuit_id": "074",
+      "ned": 0.8941176470588236,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.25,
+      "connection_recall": 0.25,
+      "components_true": 17,
+      "components_pred": 17
+    },
+    {
+      "circuit_id": "075",
+      "ned": 1.0686274509803921,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.05263157894736842,
+      "connection_recall": 0.058823529411764705,
+      "components_true": 22,
+      "components_pred": 22
+    },
+    {
+      "circuit_id": "076",
+      "ned": 0.45454545454545453,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.2727272727272727,
+      "connection_recall": 0.3,
+      "components_true": 9,
+      "components_pred": 9
+    },
+    {
+      "circuit_id": "077",
+      "ned": 1.0714285714285714,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.045454545454545456,
+      "connection_recall": 0.041666666666666664,
+      "components_true": 32,
+      "components_pred": 32
+    },
+    {
+      "circuit_id": "078",
+      "ned": 0.9,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.125,
+      "connection_recall": 0.15384615384615385,
+      "components_true": 15,
+      "components_pred": 15
+    },
+    {
+      "circuit_id": "079",
+      "ned": 0.11538461538461539,
+      "ned_exact": true,
+      "graph_isomorphism": false,
+      "connection_precision": 0.7142857142857143,
+      "connection_recall": 0.8333333333333334,
+      "components_true": 6,
+      "components_pred": 6
+    },
+    {
+      "circuit_id": "080",
+      "ned": 0.9873417721518988,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 17,
+      "components_pred": 17
+    },
+    {
+      "circuit_id": "082",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 6,
+      "components_pred": 6
+    },
+    {
+      "circuit_id": "083",
+      "ned": 0.9662921348314607,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0625,
+      "connection_recall": 0.05263157894736842,
+      "components_true": 18,
+      "components_pred": 18
+    },
+    {
+      "circuit_id": "084",
+      "ned": 0.684931506849315,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.16666666666666666,
+      "connection_recall": 0.16666666666666666,
+      "components_true": 14,
+      "components_pred": 14
+    },
+    {
+      "circuit_id": "085",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 3,
+      "components_pred": 3
+    },
+    {
+      "circuit_id": "086",
+      "ned": 0.28,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.4,
+      "connection_recall": 0.4444444444444444,
+      "components_true": 10,
+      "components_pred": 11
+    },
+    {
+      "circuit_id": "087",
+      "ned": 1.0211267605633803,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 29,
+      "components_pred": 29
+    },
+    {
+      "circuit_id": "088",
+      "ned": 0.16666666666666666,
+      "ned_exact": true,
+      "graph_isomorphism": false,
+      "connection_precision": 0.5,
+      "connection_recall": 0.6,
+      "components_true": 5,
+      "components_pred": 5
+    },
+    {
+      "circuit_id": "089",
+      "ned": 0.796875,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.3333333333333333,
+      "connection_recall": 0.35294117647058826,
+      "components_true": 12,
+      "components_pred": 12
+    },
+    {
+      "circuit_id": "090",
+      "ned": 0.12,
+      "ned_exact": true,
+      "graph_isomorphism": false,
+      "connection_precision": 0.75,
+      "connection_recall": 0.8571428571428571,
+      "components_true": 5,
+      "components_pred": 5
+    },
+    {
+      "circuit_id": "091",
+      "ned": 0.9,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.11764705882352941,
+      "connection_recall": 0.125,
+      "components_true": 11,
+      "components_pred": 11
+    },
+    {
+      "circuit_id": "092",
+      "ned": 0.8571428571428571,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.10526315789473684,
+      "connection_recall": 0.11764705882352941,
+      "components_true": 11,
+      "components_pred": 11
+    },
+    {
+      "circuit_id": "093",
+      "ned": 0.6923076923076923,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 11,
+      "components_pred": 11
+    },
+    {
+      "circuit_id": "094",
+      "ned": 0.8902439024390244,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0625,
+      "connection_recall": 0.07142857142857142,
+      "components_true": 18,
+      "components_pred": 18
+    },
+    {
+      "circuit_id": "095",
+      "ned": 0.7777777777777778,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.15384615384615385,
+      "connection_recall": 0.18181818181818182,
+      "components_true": 12,
+      "components_pred": 12
+    },
+    {
+      "circuit_id": "096",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 3,
+      "components_pred": 3
+    },
+    {
+      "circuit_id": "097",
+      "ned": 1.0396039603960396,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.038461538461538464,
+      "connection_recall": 0.05263157894736842,
+      "components_true": 22,
+      "components_pred": 22
+    },
+    {
+      "circuit_id": "099",
+      "ned": 0.875,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.2727272727272727,
+      "connection_recall": 0.25,
+      "components_true": 11,
+      "components_pred": 11
+    },
+    {
+      "circuit_id": "100",
+      "ned": 0.30303030303030304,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.4444444444444444,
+      "connection_recall": 0.5714285714285714,
+      "components_true": 7,
+      "components_pred": 7
+    },
+    {
+      "circuit_id": "101",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 5,
+      "components_pred": 5
+    },
+    {
+      "circuit_id": "102",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 9,
+      "components_pred": 9
+    },
+    {
+      "circuit_id": "103",
+      "ned": 1.0427350427350428,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 23,
+      "components_pred": 23
+    },
+    {
+      "circuit_id": "104",
+      "ned": 1.0449438202247192,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.1111111111111111,
+      "connection_recall": 0.13043478260869565,
+      "components_true": 16,
+      "components_pred": 16
+    },
+    {
+      "circuit_id": "105",
+      "ned": 0.875,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.16666666666666666,
+      "connection_recall": 0.16666666666666666,
+      "components_true": 13,
+      "components_pred": 13
+    },
+    {
+      "circuit_id": "106",
+      "ned": 0.5862068965517241,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.25,
+      "connection_recall": 0.18181818181818182,
+      "components_true": 13,
+      "components_pred": 13
+    },
+    {
+      "circuit_id": "107",
+      "ned": 0.1935483870967742,
+      "ned_exact": true,
+      "graph_isomorphism": false,
+      "connection_precision": 0.375,
+      "connection_recall": 0.42857142857142855,
+      "components_true": 7,
+      "components_pred": 7
+    },
+    {
+      "circuit_id": "108",
+      "ned": 0.4727272727272727,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.1111111111111111,
+      "connection_recall": 0.1,
+      "components_true": 12,
+      "components_pred": 12
+    },
+    {
+      "circuit_id": "109",
+      "ned": 0.4918032786885246,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 12,
+      "components_pred": 12
+    },
+    {
+      "circuit_id": "110",
+      "ned": 0.3939393939393939,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.3333333333333333,
+      "connection_recall": 0.42857142857142855,
+      "components_true": 7,
+      "components_pred": 7
+    },
+    {
+      "circuit_id": "111",
+      "ned": 0.9032258064516129,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0625,
+      "connection_recall": 0.06666666666666667,
+      "components_true": 12,
+      "components_pred": 12
+    },
+    {
+      "circuit_id": "112",
+      "ned": 0.08823529411764706,
+      "ned_exact": true,
+      "graph_isomorphism": false,
+      "connection_precision": 0.7777777777777778,
+      "connection_recall": 0.875,
+      "components_true": 7,
+      "components_pred": 7
+    },
+    {
+      "circuit_id": "113",
+      "ned": 0.5942028985507246,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.08333333333333333,
+      "connection_recall": 0.08333333333333333,
+      "components_true": 15,
+      "components_pred": 15
+    },
+    {
+      "circuit_id": "114",
+      "ned": 0.3488372093023256,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 10,
+      "components_pred": 10
+    },
+    {
+      "circuit_id": "115",
+      "ned": 0.08823529411764706,
+      "ned_exact": true,
+      "graph_isomorphism": false,
+      "connection_precision": 0.8,
+      "connection_recall": 0.8888888888888888,
+      "components_true": 7,
+      "components_pred": 7
+    },
+    {
+      "circuit_id": "116",
+      "ned": 0.0,
+      "ned_exact": true,
+      "graph_isomorphism": true,
+      "connection_precision": 1.0,
+      "connection_recall": 1.0,
+      "components_true": 5,
+      "components_pred": 5
+    },
+    {
+      "circuit_id": "117",
+      "ned": 0.4634146341463415,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.2,
+      "connection_recall": 0.2222222222222222,
+      "components_true": 8,
+      "components_pred": 8
+    },
+    {
+      "circuit_id": "118",
+      "ned": 0.6935483870967742,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.26666666666666666,
+      "connection_recall": 0.2857142857142857,
+      "components_true": 12,
+      "components_pred": 12
+    },
+    {
+      "circuit_id": "119",
+      "ned": 0.48333333333333334,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.18181818181818182,
+      "connection_recall": 0.18181818181818182,
+      "components_true": 13,
+      "components_pred": 13
+    },
+    {
+      "circuit_id": "120",
+      "ned": 0.5526315789473685,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 11,
+      "components_pred": 8
+    },
+    {
+      "circuit_id": "121",
+      "ned": 1.0410958904109588,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.04,
+      "connection_recall": 0.05555555555555555,
+      "components_true": 14,
+      "components_pred": 14
+    },
+    {
+      "circuit_id": "122",
+      "ned": 0.3953488372093023,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.2,
+      "connection_recall": 0.2222222222222222,
+      "components_true": 9,
+      "components_pred": 9
+    },
+    {
+      "circuit_id": "123",
+      "ned": 0.7377049180327869,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.23076923076923078,
+      "connection_recall": 0.23076923076923078,
+      "components_true": 12,
+      "components_pred": 12
+    },
+    {
+      "circuit_id": "124",
+      "ned": 0.821917808219178,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.0,
+      "connection_recall": 0.0,
+      "components_true": 14,
+      "components_pred": 14
+    },
+    {
+      "circuit_id": "125",
+      "ned": 0.75,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.06666666666666667,
+      "connection_recall": 0.0625,
+      "components_true": 12,
+      "components_pred": 12
+    },
+    {
+      "circuit_id": "126",
+      "ned": 0.7868852459016393,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.1111111111111111,
+      "connection_recall": 0.1,
+      "components_true": 13,
+      "components_pred": 13
+    },
+    {
+      "circuit_id": "127",
+      "ned": 0.9852941176470589,
+      "ned_exact": false,
+      "graph_isomorphism": false,
+      "connection_precision": 0.05555555555555555,
+      "connection_recall": 0.07142857142857142,
+      "components_true": 14,
+      "components_pred": 14
+    }
+  ]
+}
